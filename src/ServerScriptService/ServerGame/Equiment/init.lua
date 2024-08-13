@@ -2,10 +2,11 @@ local Players : Player = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PhysicsService = game:GetService("PhysicsService")
+local ServerButton = require(script.Parent.ButtonServer)
 local Data : table = require(ServerScriptService.ServerGame.UserPlayerData)
 local Remotes : Folder = ReplicatedStorage.Remotes
 local ItemsFolder : Folder = ReplicatedStorage.Assert.ItemsGame
-
+--! сделать тут ничего не делал
 local Equipment = {}
 
 function NoCollide(Character : Instance) -- Enabled Collides
@@ -20,7 +21,7 @@ function NoCollide(Character : Instance) -- Enabled Collides
     end
 end
 
-function Equipment:StartSysmes()
+function Equipment:StartSysmes(Player)
     PhysicsService:RegisterCollisionGroup("Players")
     PhysicsService:CollisionGroupSetCollidable("Players", "Players", false)
 
@@ -31,17 +32,15 @@ function Equipment:StartSysmes()
             end
         end
     end
-    game.Players.PlayerAdded:Connect(function(Player : Player)
-        if Player.Character then -- Если есть(доп проверка)
-            Collision(Player.Character)
-        end
+    
+    if Player.Character then -- Если есть(доп проверка)
+        Collision(Player.Character)
+    end
 
-        Player.CharacterAdded:Connect(Collision)
+    Player.CharacterAdded:Connect(Collision)
 
-        local Character : Instance = workspace:WaitForChild(Player.Name)
-        Equipment:Load(Player, Character)
-    end)
-
+    local Character : Instance = workspace:WaitForChild(Player.Name)
+    Equipment:Load(Player, Character)
 end
 
 
@@ -69,11 +68,13 @@ function Equipment:Load(Player : Player, Character : Instance)
        -- Remote.Notify:FireClient(Player, 'Blue',"You died and lost all the pollen you had!", false)
         local Character = Player.CharacterAdded:Wait()
         Equipment:Load(Player, Character)
+        ServerButton:Start()
     end)
 end
 
 function Equipment:EquipItem(Player : Player, Humanoid : Humanoid, TypeItems : string)
     local PData : table = Data:Get(Player)
+
     if PData.Equipment[TypeItems] then
         local ItemPData : table = PData.Equipment[TypeItems]
 		local ItemObject : nil
@@ -97,7 +98,7 @@ function Equipment:EquipItem(Player : Player, Humanoid : Humanoid, TypeItems : s
                 ItemObject = ItemsFolder:WaitForChild(TypeItems)[ItemPData]:Clone()
                 if ItemObject:IsA('Accessory') then
                     if TypeItems == "Tool" then
-                        local ColelctSript = game.ServerStorage.ToolScripts:Clone()
+                        local ColelctSript : Folder = game.ServerStorage.ToolScripts:Clone()
                         ColelctSript.Parent = ItemObject
                         Humanoid:AddAccessory(ItemObject)
                         ItemObject.Name = TypeItems

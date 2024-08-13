@@ -10,16 +10,19 @@ local ButtonModule = {} -- через мету таблицу
 
 function DistationButton(Button : Part, Distation)
     local suc, err = pcall(function()
-        ScriptButton = Button
         if Distation < 10 then
+            ScriptButton = Button
             TweenModule.OpenButton(Button.B)
-
             if Button.Name == "Hive" then
+                Button:SetAttribute('OpenButton', true)
+            elseif Button.Name == "Quest" then
                 Button:SetAttribute('OpenButton', true)
             end
         elseif Distation > 10  then
             TweenModule.CloseButton(Button.B)
             if Button.Name == "Hive" then
+                Button:SetAttribute('OpenButton', false)
+            elseif Button.Name == "Quest" then
                 Button:SetAttribute('OpenButton', false)
             end
         end
@@ -32,9 +35,16 @@ end
 function KeyCode(input, GPE)
     if not GPE then
         if input.KeyCode == Enum.KeyCode.E or input.UserInputType == Enum.UserInputType.Touch then
-            if ScriptButton:GetAttribute('OpenButton') then
-                AnimKeyCode(ScriptButton, input)
-               -- require(script.Parent.HiveModule):Start(ScriptButton)
+            if ScriptButton ~= nil then
+                if ScriptButton:GetAttribute('OpenButton') then
+                    AnimKeyCode(ScriptButton, input)
+                    if ScriptButton.Name == "Hive" then
+                        require(script.Parent.HiveModule):Start(ScriptButton)
+                        print('a')
+                    elseif ScriptButton.Name == "Quest" then
+                        print('f')
+                    end
+                end
             end
         end
     end
@@ -59,7 +69,9 @@ function AnimKeyCode(Button : Part, input)
     end)
 end
 
-UserInputService.InputBegan:Connect(KeyCode)
-ReplicatedStorage.Remotes.ButtonClient.OnClientEvent:Connect(DistationButton)
 
+UserInputService.InputBegan:Connect(KeyCode)
+print('f')
+ReplicatedStorage.Remotes.ClientOpenServer:FireServer()
+ReplicatedStorage.Remotes.ButtonClient.OnClientEvent:Connect(DistationButton)
 return ButtonModule

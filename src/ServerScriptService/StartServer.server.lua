@@ -1,20 +1,28 @@
---local Equiment = require(script.Equiment)
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Server : ModuleScript = script.Parent.ServerGame
-local _, Err = pcall(function()
-    --Equiment:StartSysmes()
-    require(Server.UserPlayerData)
-    task.wait(1)
-    for _, index in next, Server:GetDescendants() do
-        if index:IsA('ModuleScript') then
-            require(index)
-           -- print(index)
-        end
-    end
-end)
+require(Server.UserPlayerData)
 
-coroutine.wrap(function()
-    if Err then
-        warn(Err)
-    end
-end)()
+local Equiment = require(Server.Equiment)
+
+
+function StartSystems()
+    pcall(function()
+
+        for _, index in next, Server:GetDescendants() do
+            if index:IsA('ModuleScript') then
+                require(index)
+            end
+        end
+
+        ReplicatedStorage.Remotes.StartSystems.Event:Connect(function(player : Player, PData : table)
+            Equiment:StartSysmes(player)
+            ReplicatedStorage.Remotes.StartCleintSystems:FireClient(player)
+            ReplicatedStorage.Remotes.DataUpdate:FireClient(player,PData)
+            --require(script.Parent.ServerGame.ButtonServer):Start()
+        end)
+    end)
+end
+
+StartSystems()
+
+-- сделать нормально клиент

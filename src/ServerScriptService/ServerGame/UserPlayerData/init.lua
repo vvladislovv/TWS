@@ -32,12 +32,13 @@ function LoadUserData(player : Player)
             end)
 
             if player:IsDescendantOf(Players) == true then
+                print('Loaded Player...')
                 UserPlayerData.Profiles[player] = profile
                 UserPlayerData.Profiles[player].Data.BasicSettings.PlayerName = player.Name
                 UserPlayerData.Profiles[player].Data.BasicSettings.Loaded = true
                 UserPlayerData.AutoSaves[player.Name] = player
-                Remotes.DataUpdate:FireClient(player,UserPlayerData.Profiles[player].Data)
-                AutoSave()
+                CheckPlayer(player, UserPlayerData.Profiles[player].Data)
+                Remotes.StartSystems:Fire(player,UserPlayerData.Profiles[player].Data)
             else
                 profile:Release()
             end
@@ -67,7 +68,7 @@ function CheckPlayer(Player : Player, PData : table)
         local _, Err = pcall(function()
             HttpService:PostAsync(Webhook,
                 HttpService:JSONEncode({
-                    content = `Зашел игрок: {Player.Name} \n ID игрока: {Player.UserId}, \n}` -- Сделать PData -- DataStore игрока: \n {HttpService:JSONEncode(PData) -- Sql в веб версии онлайн
+                    content = `Зашел игрок: {Player.Name} \n ID игрока: {Player.UserId}, \n` -- Сделать PData -- DataStore игрока: \n {HttpService:JSONEncode(PData) -- Sql в веб версии онлайн
                 })
             )
         end)
@@ -95,7 +96,6 @@ end
 
 function SaveData(Player : Player, DataSettings : table)
     pcall(function()
-        print(UserPlayerData.Profiles[Player].Data)
         UserPlayerData.Profiles[Player].Data = DataSettings
         Remotes.DataUpdate:FireClient(Player,DataSettings)
     end)
@@ -105,6 +105,23 @@ function UserPlayerRemove(player : Player)
     pcall(function()
         local profile = UserPlayerData.Profiles[player]
         if profile ~= nil then
+
+            profile.Data.FakeSettings = {
+                --Field Settings
+                Field = "",
+                OldField = "",
+                GuiField = false,
+        
+                -- Mobs Settings
+                MobsAttack = false,
+                ModsField = nil,
+                PlayerAttack = false,
+                
+                --Hive Settings
+                HiveOwner = "",
+                HiveNumberOwner = "",
+            }
+
             UserPlayerData.AutoSaves[player.UserId] = nil
             profile:Release()
             warn('Data Save')
@@ -112,7 +129,17 @@ function UserPlayerRemove(player : Player)
     end)
 end
 
-function AutoSave()
+game.ReplicatedStorage.Remotes.PlayerClientData.OnServerInvoke = function(client)
+    local PData : table = UserPlayerData:Get(client)
+    return PData
+end
+
+do
+
+    game.Players.PlayerAdded:Connect(LoadUserData)
+    game.Players.PlayerRemoving:Connect(UserPlayerRemove)
+    Remotes.ClientOnServer.OnServerEvent:Connect(SetWriteData)
+
     local SaveTimer : number = 0
     pcall(function()
         coroutine.wrap(function()
@@ -134,9 +161,5 @@ function AutoSave()
     end)
 end
 
-
-Remotes.ClientOnServer.OnServerEvent:Connect(SetWriteData)
-game.Players.PlayerAdded:Connect(LoadUserData)
-game.Players.PlayerRemoving:Connect(UserPlayerRemove)
 
 return UserPlayerData

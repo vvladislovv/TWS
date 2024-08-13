@@ -27,20 +27,20 @@ local FieldModule = {}
 	}
 	
 	FieldModule.FlowerTypes = {
-		Pupler = {
-			["1"] = "rbxassetid://18597562656",
-            ["2"] = "rbxassetid://18597564076",
-            ["3"] = "rbxassetid://18597565496",
-		},
 		Blue = {
-			["1"] = "rbxassetid://18597560986",
-            ["2"] = "rbxassetid://18597559167",
-            ["3"] = "rbxassetid://18597554742",
+			["1"] = "rbxassetid://16804666619",
+            ["2"] = "rbxassetid://16804670208",
+            ["3"] = "rbxassetid://16804672980",
+		},
+		Pupler = {
+			["1"] = "rbxassetid://16804647138",
+            ["2"] = "rbxassetid://16804650053",
+            ["3"] = "rbxassetid://16804651100",
 		},
 		White = {
-            ["1"] = "rbxassetid://18597553591",
-            ["2"] = "rbxassetid://18597552081",
-            ["3"] = "rbxassetid://18597550680",
+            ["1"] = "rbxassetid://16791144157",
+            ["2"] = "rbxassetid://16804620887",
+            ["3"] = "rbxassetid://16804623294",
 		}
 	}
 
