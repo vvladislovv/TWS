@@ -29,17 +29,16 @@ end
 local ToolInfo : table = ToolsFolder.Tools(PData.Equipment.Tool)
 
 function CheckAnimTool()
-    local AnimNumber : number = 0 
-    return function ()
-        for i,_ in pairs(ToolInfo.ToolSettings.AnimTools) do
-            AnimNumber += 1
-            if AnimNumber > 1 then
-                local RandomeAnim : Random = math.random(1, AnimNumber)
-                return ToolInfo.ToolSettings.AnimTools[RandomeAnim]
-            else
-                return ToolInfo.ToolSettings.AnimTools[AnimNumber]
-            end
-        end
+    local AnimNumber : number = 0
+    for _,i in next, (ToolInfo.ToolSettings.AnimTools) do
+        AnimNumber += 1
+    end
+    
+    if AnimNumber > 1 then
+        local RandomeAnim : Random = math.random(1, AnimNumber)
+        return ToolInfo.ToolSettings.AnimTools[RandomeAnim]
+    else
+        return ToolInfo.ToolSettings.AnimTools[AnimNumber]
     end
 end
 
@@ -53,7 +52,6 @@ Mouse.Button1Up:Connect(function()
 end)
 
 function FlowerModule()
-    print('f')
     FlowerCollect:FlowerRayCost({
         TSS = ToolInfo.ToolSettings,
         RayStamp = ToolInfo.ToolSettings.RayStamp
@@ -64,13 +62,12 @@ RunService.RenderStepped:Connect(function()
     if Collecting and not Debounce then
         Debounce = true
         local Animation : Animation = Instance.new('Animation')
-        Animation.AnimationId = CheckAnimTool(ToolInfo)()
+        Animation.AnimationId = CheckAnimTool()
         local PData = DataClient:GetClient(Player)
         local Couldown : number = ToolInfo.ToolSettings.Regeniration -- / (PData.AllStats["Tools Speed"] / 100)
         local AnimationTrack : AnimationTrack = Humanoid:LoadAnimation(Animation)
         AnimationTrack.Priority = Enum.AnimationPriority.Action
         AnimationTrack:Play()
-        print(PData.IStats)
         if PData.IStats.Pollen >= PData.IStats.Capacity then
             -- noffical
         else

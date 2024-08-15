@@ -5,7 +5,7 @@ local Remotes : Folder = ReplicatedStorage:WaitForChild('Remotes')
 local FieldModule = {}
 	FieldModule.Flowers = {}
 	FieldModule.Fields = {
-		["Banana"] = {
+		["Sunflower"] = {
 			Flowers = {
 				MiniWhite = {1, 50},
 				DoubleWhite = {1, 40},
@@ -23,7 +23,7 @@ local FieldModule = {}
 	}
 	
 	FieldModule.Correspondant = {
-		["BananaPath1"] = "Banana",
+		["SunflowerPath1"] = "Sunflower",
 	}
 	
 	FieldModule.FlowerTypes = {
@@ -101,7 +101,7 @@ local FieldModule = {}
 				Color = FlowerColor,
 				Stat  = FlowerType,
 				MaxP = Flower.Size.Y,
-				MinP = Flower.Size.Y - 2,
+				MinP = Flower.Size.Y - 1.9,
 				RegenFlower = 0.3,
 			}
 

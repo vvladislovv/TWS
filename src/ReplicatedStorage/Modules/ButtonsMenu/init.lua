@@ -17,12 +17,16 @@ function DistationButton(Button : Part, Distation)
                 Button:SetAttribute('OpenButton', true)
             elseif Button.Name == "Quest" then
                 Button:SetAttribute('OpenButton', true)
+            elseif Button.Name == "ResetData" then
+                Button:SetAttribute('OpenButton', true)
             end
         elseif Distation > 10  then
             TweenModule.CloseButton(Button.B)
             if Button.Name == "Hive" then
                 Button:SetAttribute('OpenButton', false)
             elseif Button.Name == "Quest" then
+                Button:SetAttribute('OpenButton', false)
+            elseif Button.Name == "ResetData" then
                 Button:SetAttribute('OpenButton', false)
             end
         end
@@ -40,9 +44,10 @@ function KeyCode(input, GPE)
                     AnimKeyCode(ScriptButton, input)
                     if ScriptButton.Name == "Hive" then
                         require(script.Parent.HiveModule):Start(ScriptButton)
-                        print('a')
                     elseif ScriptButton.Name == "Quest" then
-                        print('f')
+                        require(script.Parent.QuestModule):StartModule(ScriptButton)
+                    elseif ScriptButton.Name == "ResetData" then
+                        Remotes.ResetData:FireServer()
                     end
                 end
             end

@@ -54,11 +54,15 @@ return {
             ['Movement Collection'] = 100,
 
             --// Field Boost 
-            ['BananaPath1'] = 100            
+            ['SunflowerPath1'] = 100            
         },
         TokenBoost = {},
         CraftBoost = {}
     },
+    
+
+    Qusets = {},
+
     HiveModule = {
         HiveSlotAll = 1, -- PlayerSlots
         

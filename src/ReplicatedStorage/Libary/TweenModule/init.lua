@@ -84,37 +84,18 @@ function TweenModule:DestroySlotHive(Hive : Folder, CheckSlot : number)
     Hive.Slots[CheckSlot].Down.Level.SurfaceGui.Enabled = false
     Hive.Slots[CheckSlot].Down.SurfaceGui.Enabled = false
 end
-function TweenModule:FlowerDown(Flower : Part, DecAm : number)
-    if Flower.Size.Y > 0.9 then
-        local TW1 = TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerDown'], {Size = Vector3.new(Flower.Size.X,Flower.Size.Y - DecAm,Flower.Size.Z)})
-        local TW2 = TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerDown'], {Position = Vector3.new(Flower.Position.X,Flower.Position.Y - DecAm,Flower.Position.Z)})
-        TW1:Play()
-        TW2:Play()
-        TW1.Completed:Wait()
-    else
-        Flower.Size = Vector3.new(Flower.Size.X,Flower.Size.X + 1,Flower.Size.Z)
-        Flower.Position = Vector3.new(Flower.Position.X,Flower.Position.X + 1,Flower.Position.Z)
-    end
+function TweenModule:FlowerDown(Flower,FlowerPos)
+    TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerDown'], {Position = FlowerPos}):Play()
 end
 
-function TweenModule:RegenUp(Flower : Part,  DecAm : number)
-    local d = false
-    if Flower.Size.Y <= 1.75 and not d then
-        d = true
-        local TW1 = TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerUp'], {Size = Vector3.new(Flower.Size.X,Flower.Size.Y + DecAm,Flower.Size.Z)})
-        local TW2 = TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerUp'], {Position = Vector3.new(Flower.Position.X,Flower.Position.Y + DecAm,Flower.Position.Z)})
-        TW1:Play()
-        TW2:Play()
-        TW1.Completed:Wait()
-        d = false
+
+function TweenModule:RegenUp(Pollen,ToMaxFlower,InfoFieldGame,FlowerPos,FlowerPosTime)
+    if ToMaxFlower < InfoFieldGame.RegenFlower then
+        Pollen.ParticleEmitter.Enabled = false
+        TweenService:Create(Pollen, TweenModule.TweenInfoTable['FlowerUp'], {Position = FlowerPos}):Play()
     else
-        d = true
-        local TW1 = TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerUp'], {Size = Vector3.new(Flower.Size.X,2,Flower.Size.Z)})
-        local TW2 = TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerUp'], {Position = Vector3.new(Flower.Position.X,1,Flower.Position.Z)})
-        TW1:Play()
-        TW2:Play()
-        TW1.Completed:Wait()
-        d = false
+        Pollen.ParticleEmitter.Enabled = false
+        TweenService:Create(Pollen, TweenModule.TweenInfoTable['FlowerUp'], {Position = FlowerPosTime}):Play()
     end
 end
 

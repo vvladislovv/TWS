@@ -4,7 +4,7 @@ local Remotes : Folder = ReplicatedStorage.Remotes
 local Data : ModuleScript = require(ServerScriptService.ServerGame.UserPlayerData)
 local GenerationField : ModuleScript = require(ServerScriptService.ServerGame.GeneratorField)
 local Zone : ModuleScript = require(ReplicatedStorage.Libary.Zone)
-
+local DecAmTable : table = {}
 local FlowerServerCollect = {}
 FlowerServerCollect.FlowerPlayerTable = {}
 
@@ -27,25 +27,25 @@ function FlowerDataBoots(PData : table, Coollected : number, FlowerTable : table
     if FlowerTable.Stat.Value == "1" then
         Coollected *= 1
         if DecAmt > 0 then
-           -- DecAmt /= 1
+            DecAmt /= 1
         end
     elseif FlowerTable.Stat.Value == "2" then
         Coollected *= 1.5
         if DecAmt > 0 then
-            --DecAmt /= 1.5
+            DecAmt /= 1.5
         end
     elseif FlowerTable.Stat.Value == "3" then
         Coollected *= 2
         if DecAmt > 0 then
-          --  DecAmt /= 2
+            DecAmt /= 2
         end
     end
 end
 
 function CollectFlower(Player : Player, Flower : Part , Tabss : table)
     local PData = Data:Get(Player)
+    print(Flower)
     if PData.IStats.Capacity > PData.IStats.Pollen and PData.FakeSettings.FallingDown ~= "" and (Flower.Position.Y - GenerationField.Flowers[Flower:GetAttribute('ID')].MinP) > 0.2 then
-        
         local FlowerTable : table = GenerationField.Flowers[Flower:GetAttribute('ID')]
         local FieldName : string = PData.FakeSettings.Field
         local FieldFolder : Instance = workspace.GameSettings:FindFirstChild(FieldName)
@@ -71,22 +71,21 @@ function CollectFlower(Player : Player, Flower : Part , Tabss : table)
         Honeyy += Convert
         Pollenn = math.round(Collected - Convert)
 
-        Remotes.FlowerDownSize:FireAllClients(Flower,DecAmt, FlowerTable)
+        Remotes.FlowerDownSize:FireAllClients(Player,Flower,DecAmt)
 
-        coroutine.wrap(function() -- VisalEvent Pollen
+        task.spawn(function()
+            task.wait(0.01)
             if FlowerServerCollect.FlowerPlayerTable[Player.Name] then 
-                if PData.SettingsMenu['Pollen Text'] then
+                if PData.SettingsMenu['Pollen Text'] and (Flower.Position.Y - GenerationField.Flowers[Flower:GetAttribute('ID')].MinP) > 0.2 then
                     for v ,index in next, (FlowerServerCollect.FlowerPlayerTable[Player.Name]) do
                         if index > 0 then
-                            Remotes.VisualNumberEvent:FireClient(Player,{Pos = Flower.Position, Amt = index, Color = v, Crit = true})
-                            task.delay(1, function()
-                                FlowerServerCollect.FlowerPlayerTable[Player.Name] = {White = 0, Blue = 0, Honey = 0,  Pupler = 0}
-                            end)
+                            Remotes.VisualNumberEvent:FireClient(Player,{Pos = Flower.Position, Amt = index, Color = v, Crit = false})
                         end
                     end
                 end
+                FlowerServerCollect.FlowerPlayerTable[Player.Name] = {White = 0, Blue = 0, Honey = 0,  Pupler = 0}
             end
-        end)()
+        end)
 
 
         if (PData.IStats.Pollen + math.round(Pollenn)) > PData.IStats.Capacity then

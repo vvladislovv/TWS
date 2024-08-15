@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = game.Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
-local IUs = PlayerGui:WaitForChild('IUs')
+local UIs = PlayerGui:WaitForChild('UIs')
 local PlatformFolder = workspace.GameSettings.PlatformGame
 local TweenModule = require(ReplicatedStorage.Libary.TweenModule)
 local isTouched = false
@@ -25,9 +25,9 @@ coroutine.wrap(function()
                     while true do
                         task.wait()
                         if (Player.Character.HumanoidRootPart.Position - value.Up.Position).Magnitude <= 10 then
-                            TweenModule:ButtonTween(IUs.ButtonUpEvent, true)
+                            TweenModule:ButtonTween(UIs.ButtonUpEvent, true)
                         else
-                            TweenModule:ButtonTween(IUs.ButtonUpEvent, false)
+                            TweenModule:ButtonTween(UIs.ButtonUpEvent, false)
                             break
                         end
                     end

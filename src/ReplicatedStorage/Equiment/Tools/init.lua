@@ -13,8 +13,8 @@ local Items = {}
                         Color = nil,
                         ColorMutltiplier = 1,
                         AnimTools = {
-                            [1] = 'rbxassetid://17469220213',
-                            --[2] = ''
+                            [1] = 'rbxassetid://18963714535',
+                            [2] = 'rbxassetid://18963812407'
                         },
                         GuiItems = "rbxassetid://17180412078",
                     },

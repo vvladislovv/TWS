@@ -19,6 +19,20 @@ local ProfileStore : FunctionalTest? = ProfileService.GetProfileStore(
     ProfileTemplate
 )
 
+function UpdateStartData(Data : table)
+    print(Data)
+    for _, v in ReplicatedStorage:WaitForChild('QuestDiologs'):GetChildren() do
+		Data.Quests[v.Name] = { -- не может понять что его нету или на оборот
+			Claimed = false,
+			Tasks = {},
+			Quest = 1,
+			Completed = false,
+		}
+        print(Data.Quests)
+	end
+    return Data
+end
+
 function LoadUserData(player : Player)
     pcall(function()
         local profile : table = ProfileStore:LoadProfileAsync("Player" .. player.UserId)
@@ -32,11 +46,13 @@ function LoadUserData(player : Player)
             end)
 
             if player:IsDescendantOf(Players) == true then
+                task.wait()
                 print('Loaded Player...')
                 UserPlayerData.Profiles[player] = profile
                 UserPlayerData.Profiles[player].Data.BasicSettings.PlayerName = player.Name
                 UserPlayerData.Profiles[player].Data.BasicSettings.Loaded = true
                 UserPlayerData.AutoSaves[player.Name] = player
+                --UpdateStartData(UserPlayerData.Profiles[player].Data)
                 CheckPlayer(player, UserPlayerData.Profiles[player].Data)
                 Remotes.StartSystems:Fire(player,UserPlayerData.Profiles[player].Data)
             else
@@ -78,6 +94,12 @@ function CheckPlayer(Player : Player, PData : table)
         end
        -- print(HttpService:JSONDecode(HttpService:JSONEncode(PData))) Error Discord
     end)()
+end
+
+function ResetDataPlayer(player : Player)
+    local PData = UserPlayerData:Get(player)
+    PData = {}
+    player:Kick("DataReset")
 end
 
 function UserPlayerData:Get(player : Player)
@@ -139,7 +161,7 @@ do
     game.Players.PlayerAdded:Connect(LoadUserData)
     game.Players.PlayerRemoving:Connect(UserPlayerRemove)
     Remotes.ClientOnServer.OnServerEvent:Connect(SetWriteData)
-
+    Remotes.ResetData.OnServerEvent:Connect(ResetDataPlayer)
     local SaveTimer : number = 0
     pcall(function()
         coroutine.wrap(function()
