@@ -8,6 +8,7 @@ TweenModule.TweenInfoTable = {
     ['HiveWaspCreate'] = TweenInfo.new(0.45,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
     ['FlowerDown'] = TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
     ['FlowerUp'] = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
+    ['TweenCamera'] = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 }
 
 
@@ -88,8 +89,7 @@ function TweenModule:FlowerDown(Flower,FlowerPos)
     TweenService:Create(Flower, TweenModule.TweenInfoTable['FlowerDown'], {Position = FlowerPos}):Play()
 end
 
-
-function TweenModule:RegenUp(Pollen,ToMaxFlower,InfoFieldGame,FlowerPos,FlowerPosTime)
+function TweenModule:RegenUp(Pollen : BasePart,ToMaxFlower : Vector3,InfoFieldGame : table,FlowerPos : Vector3,FlowerPosTime : Vector3)
     if ToMaxFlower < InfoFieldGame.RegenFlower then
         Pollen.ParticleEmitter.Enabled = false
         TweenService:Create(Pollen, TweenModule.TweenInfoTable['FlowerUp'], {Position = FlowerPos}):Play()
@@ -100,13 +100,33 @@ function TweenModule:RegenUp(Pollen,ToMaxFlower,InfoFieldGame,FlowerPos,FlowerPo
 end
 
 function TweenModule:SizeUp(VP: Frame)
-    -- VP:TweenSize
    TweenService:Create(VP.BillboardGui.TextPlayer, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Size = UDim2.new(1,0,1,0)}):Play()
 end
 
 function TweenModule:SizeDown(VP : Frame)
-  -- VP:TweenSize
    TweenService:Create(VP.BillboardGui.TextPlayer, TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Size = UDim2.new(0,0,0,0)}):Play()
 end
+
+function TweenModule:UseGui(UI : Frame, Pos : UDim2)
+    local Tw = TweenService:Create(UI,TweenModule.TweenInfoTable['TweenInfo1'],{Position = Pos})
+    Tw:Play()
+    Tw.Completed:Wait()
+end
+function TweenModule:UseCloseCamera(CameraStart : BasePart,CameraFinish : BasePart)
+    local TWCamera = TweenService:Create(CameraStart, TweenModule.TweenInfoTable['TweenCamera'], {
+        CFrame = CameraFinish
+    })
+    TWCamera:Play()
+    TWCamera.Completed:Wait()
+end
+
+function TweenModule:UseCamera(CameraStart : BasePart,CameraFinish : BasePart)
+    local TWCamera = TweenService:Create(CameraStart, TweenModule.TweenInfoTable['TweenCamera'], {
+        CFrame = CameraFinish.CFrame
+    })
+    TWCamera:Play()
+    TWCamera.Completed:Wait()
+end
+
 
 return TweenModule

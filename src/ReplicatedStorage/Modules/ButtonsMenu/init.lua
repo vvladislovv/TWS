@@ -76,7 +76,6 @@ end
 
 
 UserInputService.InputBegan:Connect(KeyCode)
-print('f')
 ReplicatedStorage.Remotes.ClientOpenServer:FireServer()
 ReplicatedStorage.Remotes.ButtonClient.OnClientEvent:Connect(DistationButton)
 return ButtonModule

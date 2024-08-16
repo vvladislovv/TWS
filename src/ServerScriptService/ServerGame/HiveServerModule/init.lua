@@ -12,16 +12,12 @@ local Remotes : Folder = ReplicatedStorage.Remotes
 
 
 function HiveOwner(Player: Player, Hive : Part, Button : Part)
-    print('f')
-    print(Data:Get(Player))
     local PData : table = Data:Get(Player)
-    print(PData.FakeSettings)
+
     if PData.FakeSettings.HiveOwner == "" and Hive:GetAttribute('Owner') == "" then
         
         PData.FakeSettings.HiveOwner = Player.Name
-        print(PData.FakeSettings.HiveOwner)
         Hive:SetAttribute('Owner', Player.Name)
-        print(Button)
         Button:SetAttribute('HiveOwner', Player.Name)
         Button.B.Enabled = false
         PData.FakeSettings.HiveNumberOwner = Hive.Name

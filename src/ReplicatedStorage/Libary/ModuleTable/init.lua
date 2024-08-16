@@ -3,7 +3,7 @@ local ModuleTable = {} do
     ModuleTable.PlayerGame = {
         Admins = {
             [1] = 'vlad060108',
-            [2] = 'Helaliky',
+            [2] = 'TOPCIERG',
         },
         BanPlayer = {
             [1] = 'dima0tu3',

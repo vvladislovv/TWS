@@ -2,6 +2,7 @@ local HttpService = game:GetService("HttpService")
 local Webhook : HttpService = "https://discordapp.com/api/webhooks/1261464441967612054/JtTohRe7cMbgyUZl7ZVE-ul6H0jraT8vvUimL4igl2PXGhNXBSVRq-pTrywQgztz4CYP"
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local Remotes : Folder = ReplicatedStorage.Remotes
 
@@ -16,21 +17,13 @@ UserPlayerData.AutoSaves = {}
 
 local ProfileStore : FunctionalTest? = ProfileService.GetProfileStore(
     ProfileStoreIndex,
-    ProfileTemplate
+    ProfileTemplate:DataNew()
 )
 
-function UpdateStartData(Data : table)
-    print(Data)
-    for _, v in ReplicatedStorage:WaitForChild('QuestDiologs'):GetChildren() do
-		Data.Quests[v.Name] = { -- не может понять что его нету или на оборот
-			Claimed = false,
-			Tasks = {},
-			Quest = 1,
-			Completed = false,
-		}
-        print(Data.Quests)
-	end
-    return Data
+function UserPlayerData:StudioItems(Player : Player)
+    local TesetData = require(game.ServerScriptService.Modules.ProfileService.ProfileStudioStoreIndex)
+    print(TesetData)
+    UserPlayerData.Profiles[Player].Data = TesetData
 end
 
 function LoadUserData(player : Player)
@@ -45,14 +38,13 @@ function LoadUserData(player : Player)
                 player:Kick()
             end)
 
-            if player:IsDescendantOf(Players) == true then
+            if player:IsDescendantOf(Players) == true then -- Сделать для тестроващиков
                 task.wait()
                 print('Loaded Player...')
                 UserPlayerData.Profiles[player] = profile
                 UserPlayerData.Profiles[player].Data.BasicSettings.PlayerName = player.Name
                 UserPlayerData.Profiles[player].Data.BasicSettings.Loaded = true
                 UserPlayerData.AutoSaves[player.Name] = player
-                --UpdateStartData(UserPlayerData.Profiles[player].Data)
                 CheckPlayer(player, UserPlayerData.Profiles[player].Data)
                 Remotes.StartSystems:Fire(player,UserPlayerData.Profiles[player].Data)
             else
@@ -66,16 +58,20 @@ function LoadUserData(player : Player)
 end
 
 function CheckPlayer(Player : Player, PData : table)
-    coroutine.wrap(function()
-        if Player:GetRankInGroup(33683629) == 3 then
-           UserPlayerData:StudioItems(Player) -- когда тест можно
-       end
-   end)()
+    if Player:GetRankInGroup(33683629) == 3 or ModuleTable.PlayerGame.Admins[Player.Name] then
+        print('f')
+        UserPlayerData:StudioItems(Player) -- когда тест можно
+    end
 
    coroutine.wrap(function()
        for _, GetTable in next, ModuleTable.PlayerGame.BanPlayer do
            if GetTable == Player.Name then
-                Player:Kick('Banned #001')
+            if not PData.BasicSettings.Banned then
+                PData.BasicSettings.Banned = true
+                Player:Kick('You have a ban in the game, you need to contact the support of our discord server!')
+            else
+                Player:Kick('You have a ban in the game, you need to contact the support of our discord server!')
+            end
            end
        end
    end)()
@@ -145,7 +141,9 @@ function UserPlayerRemove(player : Player)
             }
 
             UserPlayerData.AutoSaves[player.UserId] = nil
-            profile:Release()
+            if not RunService:IsStudio() then
+                profile:Release()
+            end
             warn('Data Save')
         end
     end)

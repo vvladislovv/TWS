@@ -44,7 +44,7 @@ end
 
 function CollectFlower(Player : Player, Flower : Part , Tabss : table)
     local PData = Data:Get(Player)
-    print(Flower)
+
     if PData.IStats.Capacity > PData.IStats.Pollen and PData.FakeSettings.FallingDown ~= "" and (Flower.Position.Y - GenerationField.Flowers[Flower:GetAttribute('ID')].MinP) > 0.2 then
         local FlowerTable : table = GenerationField.Flowers[Flower:GetAttribute('ID')]
         local FieldName : string = PData.FakeSettings.Field

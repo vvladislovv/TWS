@@ -1,5 +1,10 @@
-return {
-    BasicSettings = {
+local DataStoreService = game:GetService("DataStoreService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ProfileData = {}
+
+function ProfileData:DataNew()
+    local PData = {}
+    PData.BasicSettings = {
         Loaded = nil,
         Rank = "",
         PlayerName = "",
@@ -7,8 +12,9 @@ return {
         Premium = false,
 		Banned = false,
         Tutorial = false,
-    },
-    Equipment = {
+    }
+
+    PData.Equipment = {
         Tool = "Shovel",
         Bag = "Backpack",
 
@@ -16,8 +22,9 @@ return {
             Tools = {['Shovel'] = true},
             Bags = {['Backpack'] = true}
         }
-    },
-    FakeSettings = {
+    }
+
+    PData.FakeSettings = {
         --Field Settings
         Field = "",
         OldField = "",
@@ -31,14 +38,15 @@ return {
         --Hive Settings
         HiveOwner = "",
         HiveNumberOwner = "",
-    },
-    IStats = {
+    }
+    PData.IStats = {
         Honey = 0,
         DailyHoney = 0,
         Pollen = 0,
-        Capacity = 10000000000000000000, --350
-    },
-    BoostGame = {
+        Capacity = 350, --350
+    }
+
+   PData.BoostGame = {
         FieldBoost = {},
         PlayerBoost = {
             ["Instant"] = 0,
@@ -58,12 +66,9 @@ return {
         },
         TokenBoost = {},
         CraftBoost = {}
-    },
+    }
     
-
-    Qusets = {},
-
-    HiveModule = {
+    PData.HiveModule = {
         HiveSlotAll = 1, -- PlayerSlots
         
         WaspSlotHive = {
@@ -75,9 +80,24 @@ return {
 				Band = 0,
             },
         }
-    },
-    SettingsMenu = {
+    }
+    PData.SettingsMenu = {
         ['Pollen Text'] = true
-    },
-    ProductDeveloper = {}
-}
+    }
+    PData.ProductDeveloper = {}
+    
+    PData.Quests = {}
+    for _, v in ReplicatedStorage:WaitForChild('QuestDiologs'):GetChildren() do
+		PData.Quests[v.Name] = { -- не может понять что его нету или на оборот
+			Claimed = false,
+			Tasks = {},
+			Quest = 1,
+			Completed = false,
+		}
+        print(PData.Quests)
+	end
+
+    return PData
+end
+
+return ProfileData

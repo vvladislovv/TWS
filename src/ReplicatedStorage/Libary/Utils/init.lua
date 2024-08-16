@@ -37,6 +37,24 @@ function Utils:FormatTime(Seconds : number)
     end
 end
 
+function Utils:AnimateText(DialogueFrame : Frame, Text : string)
+    DialogueFrame.TextLabel.MaxVisibleGraphemes = 0
+
+    DialogueFrame.TextLabel.Text = Text
+
+    for i = 1, string.len(Text) do
+
+        if DialogueFrame.TextLabel.Text ~= Text  then
+            break
+        end
+
+        DialogueFrame.TextLabel.MaxVisibleGraphemes = i
+        task.wait(0.01)
+    end
+    DialogueFrame.TextLabel.MaxVisibleGraphemes = -1
+
+end
+
 function Utils:Addprefixes(Num : number)
     for i = 1, #Utils.prefixes do
         if Num < 10 ^ (i * 3) then
