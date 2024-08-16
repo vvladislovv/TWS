@@ -25,7 +25,17 @@ local FieldModule = {}
 	FieldModule.Correspondant = {
 		["SunflowerPath1"] = "Sunflower",
 	}
-	
+
+	FieldModule.FieldDrops = function(FieldName : string)
+		local TableFieldDrop = {
+			['Sunflower'] = {
+				['Seed'] = 1,
+			}
+		}
+
+		return TableFieldDrop[FieldName]
+	end
+
 	FieldModule.FlowerTypes = {
 		Blue = {
 			["1"] = "rbxassetid://16804666619",

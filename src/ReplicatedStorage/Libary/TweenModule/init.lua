@@ -8,7 +8,9 @@ TweenModule.TweenInfoTable = {
     ['HiveWaspCreate'] = TweenInfo.new(0.45,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
     ['FlowerDown'] = TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
     ['FlowerUp'] = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
-    ['TweenCamera'] = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    ['TweenCamera'] = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    ['TokenUpField'] = TweenInfo.new(1.5,Enum.EasingStyle.Elastic,Enum.EasingDirection.Out),
+    ['TweenRotation'] = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
 }
 
 
@@ -127,6 +129,21 @@ function TweenModule:UseCamera(CameraStart : BasePart,CameraFinish : BasePart)
     TWCamera:Play()
     TWCamera.Completed:Wait()
 end
+
+function TweenModule:FieldUpToken(TokenNew : Model, TokenInfo : table)
+    TokenNew.Inside.Position = TokenInfo.Pos
+    TokenNew.Outside.Position = TokenInfo.Pos
+
+    TweenService:Create(TokenNew.Inside, TweenModule.TweenInfoTable['TokenUpField'],{Position = TokenNew.Inside.Position + Vector3.new(0, 3, 0)}):Play()
+    TweenService:Create(TokenNew.Outside, TweenModule.TweenInfoTable['TokenUpField'],{Position = TokenNew.Outside.Position + Vector3.new(0, 3, 0)}):Play()
+end
+
+
+function TweenModule:AnimationToken(TokenNew : Model)
+    TweenService:Create(TokenNew.Inside, TweenModule.TweenInfoTable['TweenRotation'],{CFrame = TokenNew.Inside.CFrame * CFrame.Angles(0, 0, math.rad(3))}):Play()
+    TweenService:Create(TokenNew.Outside, TweenModule.TweenInfoTable['TweenRotation'],{CFrame = TokenNew.Outside.CFrame * CFrame.Angles(0, 0, math.rad(3))}):Play()
+end
+
 
 
 return TweenModule

@@ -4,6 +4,8 @@ local Remotes : Folder = ReplicatedStorage.Remotes
 local Data : ModuleScript = require(ServerScriptService.ServerGame.UserPlayerData)
 local GenerationField : ModuleScript = require(ServerScriptService.ServerGame.GeneratorField)
 local Zone : ModuleScript = require(ReplicatedStorage.Libary.Zone)
+local Utils : ModuleScript = require(ReplicatedStorage.Libary.Utils)
+local TokenModule : ModuleScript = require(ServerScriptService.ServerGame.TokenModule)
 local DecAmTable : table = {}
 local FlowerServerCollect = {}
 FlowerServerCollect.FlowerPlayerTable = {}
@@ -99,6 +101,21 @@ function CollectFlower(Player : Player, Flower : Part , Tabss : table)
         if FlowerServerCollect.FlowerPlayerTable[Player.Name] then
             FlowerServerCollect.FlowerPlayerTable[Player.Name][FlowerTable.Color] += math.round(Pollenn)
             FlowerServerCollect.FlowerPlayerTable[Player.Name].Honey += math.round(Honeyy)
+        end
+
+        local DropChance : Random? = Utils:ChanceRandome(math.random(2,100))
+
+        if true then -- DropChance <= 10
+            local Items = GenerationField.FieldDrops(PData.FakeSettings.Field)
+            TokenModule:CreateToken({
+                Type = "Any",
+                Item = Items,
+                Model = nil,
+                Player = Player,
+                Pos = Flower.Position, -- + Vector3.new(0, 2.5, 0)
+                Amt = 1,
+                Resource = `from {PData.FakeSettings.OldField} Field`
+            })
         end
     end
 end

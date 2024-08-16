@@ -55,6 +55,23 @@ function Utils:AnimateText(DialogueFrame : Frame, Text : string)
 
 end
 
+function Utils:ChanceRandome(TableChance : number )
+    local function GetRandome(min, max)
+        local Randome = Random.new():NextInteger(min, max)
+        return Randome
+    end
+    
+    local NewTable = TableChance
+    local Randomer
+	coroutine.wrap(function()
+		while true do
+			Randomer = GetRandome(NewTable,NewTable * math.random(2,5) / 2 )
+            break
+		end
+	end)()
+    return Randomer
+end
+
 function Utils:Addprefixes(Num : number)
     for i = 1, #Utils.prefixes do
         if Num < 10 ^ (i * 3) then
