@@ -111,7 +111,7 @@ local FieldModule = {}
 				Color = FlowerColor,
 				Stat  = FlowerType,
 				MaxP = Flower.Size.Y,
-				MinP = Flower.Size.Y - 1.9,
+				MinP = Flower.Size.Y - 2,
 				RegenFlower = 0.3,
 			}
 

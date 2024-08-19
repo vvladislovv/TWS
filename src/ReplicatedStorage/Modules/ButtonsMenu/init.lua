@@ -19,6 +19,8 @@ function DistationButton(Button : Part, Distation)
                 Button:SetAttribute('OpenButton', true)
             elseif Button.Name == "ResetData" then
                 Button:SetAttribute('OpenButton', true)
+            elseif Button.Name == "Shop" then
+                Button:SetAttribute('OpenButton', true)
             end
         elseif Distation > 10  then
             TweenModule.CloseButton(Button.B)
@@ -27,6 +29,8 @@ function DistationButton(Button : Part, Distation)
             elseif Button.Name == "Quest" then
                 Button:SetAttribute('OpenButton', false)
             elseif Button.Name == "ResetData" then
+                Button:SetAttribute('OpenButton', false)
+            elseif Button.Name == "Shop" then
                 Button:SetAttribute('OpenButton', false)
             end
         end
@@ -46,6 +50,8 @@ function KeyCode(input, GPE)
                         require(script.Parent.HiveModule):Start(ScriptButton)
                     elseif ScriptButton.Name == "Quest" then
                         require(script.Parent.QuestModule):StartModule(ScriptButton)
+                    elseif ScriptButton.Name == "Shop" then
+                        require(script.Parent.ShopModule):StartModule(ScriptButton)
                     elseif ScriptButton.Name == "ResetData" then
                         Remotes.ResetData:FireServer()
                     end

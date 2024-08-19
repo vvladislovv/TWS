@@ -105,7 +105,7 @@ function CollectFlower(Player : Player, Flower : Part , Tabss : table)
 
         local DropChance : Random? = Utils:ChanceRandome(math.random(2,100))
 
-        if true then -- DropChance <= 10
+        if DropChance <= 10 then 
             local Items = GenerationField.FieldDrops(PData.FakeSettings.Field)
             TokenModule:CreateToken({
                 Type = "Any",

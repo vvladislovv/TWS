@@ -93,7 +93,7 @@ end
 function FlowerCollect:Regeneration(Field)
     local InfoFieldGame = GetField[Field.Name]
         task.spawn(function()
-            while Field do task.wait(math.random(1,8))
+            while Field do task.wait(math.random(2,6))
                 for i, Pollen in pairs(Field:GetChildren()) do
                     if Pollen:IsA("BasePart") then
                     InfoFieldGame = GetField.Flowers[Pollen:GetAttribute('ID')]
@@ -122,7 +122,7 @@ end
 function DownFlower(Player,Flower : Part, DecAm : Vector3)
     local FlowerPos = Flower.Position - Vector3.new(0,DecAm,0)
     local infofield = GetField.Flowers[Flower:GetAttribute('ID')]
-    if (Flower.Position.Y - infofield.MinP) > 0.2 then
+    if (Flower.Position.Y - infofield.MinP) > 0.25 then
         TweenModule:FlowerDown(Flower,FlowerPos)
     end
 end

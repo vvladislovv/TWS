@@ -38,6 +38,8 @@ function ProfileData:DataNew()
         --Hive Settings
         HiveOwner = "",
         HiveNumberOwner = "",
+        
+        OpenShop = false
     }
     PData.IStats = {
         Honey = 1000000000000000000000,

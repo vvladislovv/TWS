@@ -106,9 +106,10 @@ function UserPlayerData:Get(player : Player)
     end
 end
 
-function SetWriteData(Player : Player, DataSettings : table, Data : table)
+function SetWriteData(Player : Player, DataSettings : string)
     pcall(function()
-        UserPlayerData.Profiles[Player].Data[DataSettings] = Data
+        UserPlayerData.Profiles[Player].Data[DataSettings[1]][DataSettings[2]] = DataSettings[3]
+       -- UserPlayerData.Profiles[Player].Data[DataSettings][DataS2] = Data1
     end)
 end
 
@@ -144,6 +145,7 @@ function UserPlayerRemove(player : Player)
             if not RunService:IsStudio() then
                 profile:Release()
             end
+            print(profile.Data)
             warn('Data Save')
         end
     end)

@@ -10,13 +10,14 @@ local TokenModule = {}
 
 function TokenModule:CreateToken(InfoToken : table)
     local NewToken : BasePart = Token:Clone()
-    local TokenInfo : table, Public : boolean 
+    local TokenInfo : table, Public : boolean
 
     if InfoToken.Type == "Any" then
         for index, value in InfoToken.Item do
             TokenInfo = TokenInfoTable[index]
         end
    end
+   
    if not workspace.GameSettings.Tokens:FindFirstChild(InfoToken.Player.Name) then
         local FolderOwner : Folder? = Instance.new("Folder",workspace.GameSettings.Tokens)
         FolderOwner.Name = InfoToken.Player.Name
@@ -27,10 +28,38 @@ function TokenModule:CreateToken(InfoToken : table)
     for i = 1, 2 do
         NewToken.Inside['Decal'..i].Texture = TokenInfo.Decal
     end
-    
-    TweenModule:FieldUpToken(NewToken, InfoToken)
 
-    --Remotes.TokenClient:FireAllClients(NewToken) -- Проблема в том что есть баг который багает анимку. Ушел не смог пофиксить 17.08
+    NewToken.Inside.Position = InfoToken.Pos
+    NewToken.Outside.Position = InfoToken.Pos
+
+    Remotes.TokenClient:FireAllClients(NewToken)
+
+    task.delay(TokenInfo.Timer, function() 
+        if NewToken and NewToken:FindFirstChild('Inside') and NewToken:FindFirstChild('Outside') then
+            TweenModule:DestroyToken(NewToken)
+        end
+    end)
+
+    NewToken.Inside.Touched:Connect(function(hit)
+        if workspace.GameSettings.Tokens:FindFirstChild(hit.Parent.Name) and workspace:FindFirstChild(hit.Parent.Name) and game.Players:FindFirstChild(hit.Parent.Name) then
+            NewToken:FindFirstChild('Inside').CanTouch = false
+            NewToken:FindFirstChild('Outside').CanTouch = false
+            TweenModule:TouchedToken(NewToken)
+
+        end
+    end)
+
 end
+
+Remotes.TokenServerStart.OnServerEvent:Connect(function(Player : Player, TokenCloner : BasePart)
+    TweenModule:FieldUpToken(TokenCloner)
+
+    task.spawn(function()
+        while true do task.wait()
+            TweenModule:AnimationToken(TokenCloner)
+        end
+    end)
+
+end)
 
 return TokenModule

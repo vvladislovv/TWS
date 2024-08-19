@@ -11,6 +11,9 @@ TweenModule.TweenInfoTable = {
     ['TweenCamera'] = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['TokenUpField'] = TweenInfo.new(1.5,Enum.EasingStyle.Elastic,Enum.EasingDirection.Out),
     ['TweenRotation'] = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    ["DestroyToken"] = TweenInfo.new(1),
+    ['TweenTouched'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 }
 
 
@@ -130,20 +133,56 @@ function TweenModule:UseCamera(CameraStart : BasePart,CameraFinish : BasePart)
     TWCamera.Completed:Wait()
 end
 
-function TweenModule:FieldUpToken(TokenNew : Model, TokenInfo : table)
-    TokenNew.Inside.Position = TokenInfo.Pos
-    TokenNew.Outside.Position = TokenInfo.Pos
-
-    TweenService:Create(TokenNew.Inside, TweenModule.TweenInfoTable['TokenUpField'],{Position = TokenNew.Inside.Position + Vector3.new(0, 3, 0)}):Play()
-    TweenService:Create(TokenNew.Outside, TweenModule.TweenInfoTable['TokenUpField'],{Position = TokenNew.Outside.Position + Vector3.new(0, 3, 0)}):Play()
+function TweenModule:DestroyToken(NewToken : BasePart)
+    TweenService:Create(NewToken.Inside, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.Outside, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.Inside.Decal1, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.Inside.Decal2, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    task.wait(3)
+    if NewToken then
+        NewToken:Destroy()
+    end
 end
 
+function TweenModule:FieldUpToken(TokenNew : Model, TokenInfo : table)
+    if TokenNew ~= nil and TokenNew:FindFirstChild('Inside') and TokenNew:FindFirstChild('Outside') or not TokenNew:GetAttribute('Touched') then
+        local g = {Position = TokenNew.Inside.Position + Vector3.new(0, 3, 0)}
+        local ff = {Position = TokenNew.Outside.Position + Vector3.new(0, 3, 0)}
+        TweenService:Create(TokenNew.Inside, TweenModule.TweenInfoTable['TokenUpField'],g):Play()
+        TweenService:Create(TokenNew.Outside, TweenModule.TweenInfoTable['TokenUpField'],ff):Play()
+    end
+end
+
+function TweenModule:TouchedToken(NewToken)
+
+    TweenService:Create(NewToken.Inside, TweenModule.TweenInfoTable['TweenTouched'],{Orientation = Vector3.new(0,0,math.rad(1))}):Play()
+    TweenService:Create(NewToken.Outside, TweenModule.TweenInfoTable['TweenTouched'],{Orientation = Vector3.new(0,0,math.rad(1))}):Play()
+
+    TweenService:Create(NewToken.Inside, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.Outside, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.Inside.Decal1, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.Inside.Decal2, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+
+    TweenService:Create(NewToken.Inside, TweenModule.TweenInfoTable['TweenTouched'],{Position = NewToken.Outside.Position + Vector3.new(0,8,0)}):Play()
+    TweenService:Create(NewToken.Outside, TweenModule.TweenInfoTable['TweenTouched'],{Position = NewToken.Outside.Position + Vector3.new(0,8,0)}):Play()
+    
+
+    task.delay(3,function()
+        NewToken:Destroy()
+    end)
+end
 
 function TweenModule:AnimationToken(TokenNew : Model)
-    TweenService:Create(TokenNew.Inside, TweenModule.TweenInfoTable['TweenRotation'],{CFrame = TokenNew.Inside.CFrame * CFrame.Angles(0, 0, math.rad(3))}):Play()
-    TweenService:Create(TokenNew.Outside, TweenModule.TweenInfoTable['TweenRotation'],{CFrame = TokenNew.Outside.CFrame * CFrame.Angles(0, 0, math.rad(3))}):Play()
+    if TokenNew ~= nil and TokenNew:FindFirstChild('Inside') and TokenNew:FindFirstChild('Outside') then
+        TweenService:Create(TokenNew.Inside, TweenModule.TweenInfoTable['TweenRotation'],{CFrame = TokenNew.Inside.CFrame * CFrame.Angles(0, 0, math.rad(3))}):Play()
+        TweenService:Create(TokenNew.Outside, TweenModule.TweenInfoTable['TweenRotation'],{CFrame = TokenNew.Outside.CFrame * CFrame.Angles(0, 0, math.rad(3))}):Play()
+    end
 end
 
+
+function TweenModule:UseGuiFrame(GetFrame : Frame, Pos : UDim2)
+    TweenService:Create(GetFrame, TweenModule.TweenInfoTable['UseShop'], {Position = Pos}):Play()
+end
 
 
 return TweenModule
