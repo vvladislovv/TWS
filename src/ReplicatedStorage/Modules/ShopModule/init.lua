@@ -63,7 +63,7 @@ function GuiFrameShop(Type : string)
         TweenModule:UseGuiFrame(ShopsFrame.FrameDecs, UDim2.new(0.788, 0,0.195, 0))
         TweenModule:UseGuiFrame(ShopsFrame.LeftFrame, UDim2.new(0.359, 0,0.846, 0))
         TweenModule:UseGuiFrame(ShopsFrame.RightFrame, UDim2.new(0.608, 0,0.846, 0))
-    elseif Type == "Update" then
+    elseif Type == "Update" then -- Сделать разбивку для ингридиентов
         TweenModule:UseCamera(Camera,CameraNPC[IndexCamera])
         local InfoTools : table = EquimentModule[CameraNPC[IndexCamera]:GetAttribute('TypeItem')]
         local ItemsInfo : table? = nil
@@ -74,7 +74,19 @@ function GuiFrameShop(Type : string)
 
         local ModuleShop = ItemsInfo[CameraNPC[IndexCamera]:GetAttribute('TypeItem')](CameraNPC[IndexCamera]:GetAttribute('NameItem'))
 
-        print(ModuleShop)
+        local function GuiUpdate()
+            local Decs : Frame = ShopsFrame.FrameDecs.Decs
+            local MoneyText : Frame = ShopsFrame.FrameDecs.MoneyText
+            local NameText : Frame = ShopsFrame.FrameDecs.NameText
+
+            Utils:AnimateText(NameText, CameraNPC[IndexCamera]:GetAttribute('NameItem'))
+            Utils:AnimateText(Decs, ModuleShop.ToolShop.Description)
+           --[[ Decs.TextLabel.Text = ModuleShop.ToolShop.Description -- можно добавить Utils анимацию текста
+            NameText.TextLabel.Text = CameraNPC[IndexCamera]:GetAttribute('NameItem')]]
+            MoneyText.TextLabel.Text = `{Utils:CommaNumber(ModuleShop.ToolShop.Cost)} Money`
+        end
+
+        GuiUpdate()
     elseif Type == "Close" then
         TweenModule:UseGuiFrame(ShopsFrame.BuyFrame, UDim2.new(0.418, 0,1.5, 0))
         TweenModule:UseGuiFrame(ShopsFrame.FrameDecs, UDim2.new(1.5, 0,0.195, 0))

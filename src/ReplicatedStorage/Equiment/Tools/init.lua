@@ -20,7 +20,7 @@ local Items = {}
                     },
                     
                     ToolShop ={
-                        Description = "",
+                        Description = "asjd;gljasl;djglasdgloiu9821359879(IUEIUFHIEWHISDKFkLKHSDLKFJHS",
                         Type = 'Tool',
                         Cost = 0,
                         Craft = {},
