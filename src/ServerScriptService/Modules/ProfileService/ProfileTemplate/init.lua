@@ -20,7 +20,7 @@ function ProfileData:DataNew()
 
         Shops = {
             Tools = {['Shovel'] = true},
-            Bags = {['Backpack'] = true}
+            Bags = {['Backpack'] = true} -- исправить
         }
     }
 

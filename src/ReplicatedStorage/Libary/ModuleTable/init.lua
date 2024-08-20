@@ -87,6 +87,71 @@ local ModuleTable = {} do
         end
     end
 
+    ModuleTable.Items = function(Name : string)
+        local TableItems = {
+            ['Strawberry'] = {
+                Decs = "",
+                Image = "rbxassetid://17180412078",
+                
+                --Recept
+                Type = "",
+                CanInput = true,
+			    Amount = 50,
+            },
+            ['Sugar'] = {
+                Decs = "",
+                Image = "rbxassetid://17180412078",
+                
+                --Recept
+                Type = "",
+                CanInput = true,
+			    Amount = 50,
+            },
+            ['Treat'] = {
+                Decs = "",
+                Image = "rbxassetid://17180412078",
+                
+                --Recept
+                Type = "",
+                CanInput = true,
+			    Amount = 50,
+            },
+            ['Oil'] = {
+                Decs = "",
+                Image = "rbxassetid://17180412078",
+                
+                --Recept
+                Type = "",
+                CanInput = true,
+			    Amount = 50,
+            },
+            ['Blueberry'] = {
+                Decs = "",
+                Image = "rbxassetid://17180412078",
+                
+                --Recept
+                Type = "",
+                CanInput = true,
+			    Amount = 50,
+            },
+            ['Seed'] = {
+                Decs = "",
+                Image = "rbxassetid://17180412078",
+                
+                --Recept
+                Type = "",
+                CanInput = true,
+			    Amount = 50,
+            },
+        }
+
+        for index, value in next, TableItems do
+            if index == Name then
+                return value
+            end
+        end
+    end 
+
 end
 
 
