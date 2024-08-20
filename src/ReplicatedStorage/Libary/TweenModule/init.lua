@@ -13,7 +13,8 @@ TweenModule.TweenInfoTable = {
     ['TweenRotation'] = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ["DestroyToken"] = TweenInfo.new(1),
     ['TweenTouched'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-    ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 }
 
 
@@ -153,7 +154,7 @@ function TweenModule:FieldUpToken(TokenNew : Model, TokenInfo : table)
     end
 end
 
-function TweenModule:TouchedToken(NewToken)
+function TweenModule:TouchedToken(NewToken : Model)
 
     TweenService:Create(NewToken.Inside, TweenModule.TweenInfoTable['TweenTouched'],{Orientation = Vector3.new(0,0,math.rad(1))}):Play()
     TweenService:Create(NewToken.Outside, TweenModule.TweenInfoTable['TweenTouched'],{Orientation = Vector3.new(0,0,math.rad(1))}):Play()
@@ -179,10 +180,23 @@ function TweenModule:AnimationToken(TokenNew : Model)
     end
 end
 
+function TweenModule:ColorUpdate(Framer : Frame, Color : Color3)
+    TweenService:Create(Framer, TweenModule.TweenInfoTable['UseShop'], {BackgroundColor3 = Color}):Play()
+end
+
+function TweenModule:SizePositionGui(Framer : Frame, Pos : UDim2, Sizee : UDim2)
+    local tw = TweenService:Create(Framer,TweenModule.TweenInfoTable['UseShop'], {Size = Sizee})
+    local tw2 = TweenService:Create(Framer,TweenModule.TweenInfoTable['UseShop'], {Position = Pos})
+    tw:Play()
+    tw2:Play()
+end
 
 function TweenModule:UseGuiFrame(GetFrame : Frame, Pos : UDim2)
     TweenService:Create(GetFrame, TweenModule.TweenInfoTable['UseShop'], {Position = Pos}):Play()
 end
 
+function TweenModule:AmiteButton(GetFrame : Frame, Pos : UDim2)
+    TweenModule:Create(GetFrame,TweenModule.TweenInfoTable['AnimateButton'], {Position = Pos})
+end
 
 return TweenModule

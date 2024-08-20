@@ -134,7 +134,7 @@ function GetGuiFrame(NPCName : string, NPCData : table, DialogueTable : table)
     end)
 
     CancelConnect = ButtonCancel.MouseButton1Click:Connect(function()
-        SkipConnect:Disconnect()
+        CancelConnect:Disconnect()
         if ClickConnect then
             ClickConnect:Disconnect()
             FinishQuest(NPCName,"Cancel")

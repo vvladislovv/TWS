@@ -7,6 +7,7 @@ local UIs : StarterGui = PlayerGui:WaitForChild('UIs')
 local ShopsFrame : Frame = UIs:WaitForChild('Shops')
 local Camera = workspace.CurrentCamera
 local CameraNPC : Camera = nil
+local ModuleShop : table = nil
 
 -- // Libary
 local DataClient : ModuleScript = require(ReplicatedStorage.Libary.ClientData)
@@ -57,6 +58,7 @@ function CameraCloseShops()
 end
 
 function GuiFrameShop(Type : string)
+    BuyButtonFrame()
     if Type == "Start" then
         --[[local InfoTools : table = EquimentModule[Camers:GetAttribute('Items')]
         print(InfoTools)]]
@@ -74,9 +76,11 @@ function GuiFrameShop(Type : string)
             ItemsInfo = require(InfoTools)
         end
 
-        local ModuleShop = ItemsInfo[CameraNPC[IndexCamera]:GetAttribute('TypeItem')](CameraNPC[IndexCamera]:GetAttribute('NameItem'))
+        ModuleShop = ItemsInfo[CameraNPC[IndexCamera]:GetAttribute('TypeItem')](CameraNPC[IndexCamera]:GetAttribute('NameItem'))
         BuyItems(ModuleShop, CameraNPC[IndexCamera]:GetAttribute('NameItem'))
+
         if ModuleShop.SetingsShop.Craft ~= nil then
+            
             local CraftInfo : table = ModuleShop.SetingsShop.Craft
             local Ingred : Frame? = ShopsFrame.Ingredients
             
@@ -119,8 +123,7 @@ function GuiFrameShop(Type : string)
                 }
                 for indexNum, value in TableSize do
                     if index == indexNum then
-                        Ingred.Position = value.Position
-                        Ingred.Size = value.Size
+                        TweenModule:SizePositionGui(Ingred,value.Position,value.Size)
                     end
                 end
             end
@@ -131,14 +134,17 @@ function GuiFrameShop(Type : string)
                 SizeIngridiedFrame(index)
                 TempCraft.Parent = Ingred
                 TempCraft.Name = value.Name
+                TempCraft.LabelX.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TempCraft.Textture.Image = ItemTable.Image
                 TempCraft.LabelX.Text = `x{value.Amt}`
             end
             --{0, 72},{0, 72}
+            IngredientColorNumber(ModuleShop)
             TweenModule:UseGuiFrame(ShopsFrame.Ingredients, UDim2.new(0.756, 0,0.504, 0))
         else
             TweenModule:UseGuiFrame(ShopsFrame.Ingredients, UDim2.new(0.95, 0,0.504, 0))
         end
+
         
         local function GuiUpdate()
             local Decs : Frame = ShopsFrame.FrameDecs.Decs
@@ -198,7 +204,58 @@ function RigthCamera()
         task.delay(0.3, function()
             Denounce = false
         end)
+
         GuiFrameShop("Update")
+    end
+end
+
+function BuyButtonFrame()
+    local Button : string = ShopsFrame.BuyFrame.Buy.TextLabel
+    local originalSize = UDim2.new(0.896, 0,0.792, 0)
+    local smallerSize = UDim2.new(0.848, 0,0.749, 0)
+    if ShopVisual then
+        
+        if Denounce then return end
+        Denounce = true
+        Button.MouseButton1Down:Connect(function()
+            local TNameItems = CameraNPC[IndexCamera]:GetAttribute('NameItem')
+            Remotes.ShopServerRemote:FireServer(Button.Text, ModuleShop, TNameItems)
+            ShopsFrame.BuyFrame.Buy:TweenSize(smallerSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, .25, true)
+        end)
+        
+        Button.MouseButton1Up:Connect(function()
+            ShopsFrame.BuyFrame.Buy:TweenSize(originalSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, .25, true)
+        end)
+
+        task.delay(0.3, function()
+            Denounce = false
+        end)
+    end
+end
+
+function IngredientColorNumber(ModuleShop : table)
+    local PData : table = DataClient:GetClient()
+    local Inventory : table = PData.Inventory
+    local CraftSettings : table = ModuleShop.SetingsShop.Craft
+    local IntegerFrame : Frame = ShopsFrame.Ingredients
+    local CraftInfo : table? = nil
+
+    for index, value in CraftSettings do
+        CraftInfo = value
+    end
+
+    for _, Framee in next, IntegerFrame:GetChildren() do
+        if Framee:IsA('Frame') then
+            if Inventory[Framee.Name] then
+                if Inventory[Framee.Name] >= CraftInfo.Amt then
+                    Framee.LabelX.TextColor3 = Color3.fromRGB(255, 255, 255)
+                elseif Inventory[Framee.Name] < CraftInfo.Amt then
+                    Framee.LabelX.TextColor3 = Color3.fromRGB(255, 0, 4)
+                end
+            elseif Inventory[Framee.Name] == nil then
+                Framee.LabelX.TextColor3 = Color3.fromRGB(255, 0, 4)
+            end
+        end
     end
 end
 
@@ -206,14 +263,45 @@ function BuyItems(ModuleShop : table, NameItem)
     local ButtonBuy : Frame = ShopsFrame.BuyFrame
     local PData : table = DataClient:GetClient()
 
-    if PData.IStats.Honey >= ModuleShop.SetingsShop.Cost and (not PData.Equipment.Shops[ModuleShop.SetingsShop.Type.."s"][NameItem] or not PData.Equipment[ModuleShop.SetingsShop.Type] == NameItem) then
-        print('Cost')
+    if PData.IStats.Honey >= ModuleShop.SetingsShop.Cost and PData.Equipment.Shops[ModuleShop.SetingsShop.Type.."s"][NameItem] == nil and PData.Equipment[ModuleShop.SetingsShop.Type] ~= NameItem then
+        if ModuleShop.SetingsShop.Craft ~= nil then
+            for _, v in next, ModuleShop.SetingsShop.Craft do
+                for index, value in next, PData.Inventory do
+                    if index == v.Name then
+                        if value >= v.Amt then
+                            TweenModule:ColorUpdate(ButtonBuy.Buy, Color3.fromRGB(133, 255, 133))
+                            ButtonBuy.Buy.TextLabel.Text = "Purchase"
+                            
+                        elseif value < v.Amt then
+                           -- ButtonBuy.Buy.BackgroundColor3 = Color3.fromRGB(255, 0, 4)
+                            TweenModule:ColorUpdate(ButtonBuy.Buy, Color3.fromRGB(255, 0, 4)) 
+                            ButtonBuy.Buy.TextLabel.Text = "Can't Affod"
+                          
+                        end
+                    end
+                end
+
+                if not PData.Inventory[v.Name] then
+                    TweenModule:ColorUpdate(ButtonBuy.Buy, Color3.fromRGB(255, 0, 4)) 
+                    ButtonBuy.Buy.TextLabel.Text = "Can't Affod"
+                   
+                end
+
+            end
+        end
     elseif PData.IStats.Honey < ModuleShop.SetingsShop.Cost then
-        print('No Cost')
-    elseif PData.Equipment.Shops[ModuleShop.SetingsShop.Type.."s"][NameItem] then
-        print('Equipment')
+        TweenModule:ColorUpdate(ButtonBuy.Buy, Color3.fromRGB(255, 0, 4))
+        ButtonBuy.Buy.TextLabel.Text = "Can't Affod"
+       -- IngredientColorNumber()
+
+    elseif PData.Equipment.Shops[ModuleShop.SetingsShop.Type.."s"][NameItem] ~= nil and PData.Equipment[ModuleShop.SetingsShop.Type] == NameItem  then
+        TweenModule:ColorUpdate(ButtonBuy.Buy, Color3.fromRGB(255, 130, 41))
+        ButtonBuy.Buy.TextLabel.Text = "Equipped"
+      
     elseif PData.Equipment[ModuleShop.SetingsShop.Type] == NameItem then
-        print('Shop Equipment')
+        TweenModule:ColorUpdate(ButtonBuy.Buy, Color3.fromRGB(207, 131, 255))
+        ButtonBuy.Buy.TextLabel.Text = "Equip"
+        
     end
 end
 

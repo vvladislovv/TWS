@@ -39,7 +39,7 @@ local Items = {}
                                 Amt = 30,
                             },
                             [3] = {
-                                Name = "Blueberry",
+                                Name = "Oil",
                                 Amt = 30,
                             }
                         }
