@@ -21,9 +21,14 @@ local ProfileStore : FunctionalTest? = ProfileService.GetProfileStore(
 )
 
 function UserPlayerData:StudioItems(Player : Player)
-    local TesetData = require(game.ServerScriptService.Modules.ProfileService.ProfileStudioStoreIndex)
-    print(TesetData)
-    UserPlayerData.Profiles[Player].Data = TesetData
+    local TesetData = require(game.ServerScriptService.Modules.ProfileService.ProfileStudioStoreIndex):DataNew()
+
+    if TesetData then
+    warn('Loaded Test Player <Data not Save>')
+        UserPlayerData.Profiles[Player].Data = TesetData
+    else
+        warn('Loaded Player <Data Save>')
+    end
 end
 
 function LoadUserData(player : Player)
@@ -40,8 +45,8 @@ function LoadUserData(player : Player)
 
             if player:IsDescendantOf(Players) == true then -- Сделать для тестроващиков
                 task.wait()
-                print('Loaded Player...')
                 UserPlayerData.Profiles[player] = profile
+                CheckPlayer(player, UserPlayerData.Profiles[player].Data)
                 UserPlayerData.Profiles[player].Data.BasicSettings.PlayerName = player.Name
                 UserPlayerData.Profiles[player].Data.BasicSettings.Loaded = true
                 UserPlayerData.AutoSaves[player.Name] = player
@@ -58,9 +63,10 @@ function LoadUserData(player : Player)
 end
 
 function CheckPlayer(Player : Player, PData : table)
-    if Player:GetRankInGroup(33683629) == 3 or ModuleTable.PlayerGame.Admins[Player.Name] then
-        print('f')
-        UserPlayerData:StudioItems(Player) -- когда тест можно
+    for _, GetTable in next, ModuleTable.PlayerGame.Admins do
+        if Player:GetRankInGroup(33683629) == 3 or GetTable == Player.Name then
+            UserPlayerData:StudioItems(Player) -- когда тест можно
+        end
     end
 
    coroutine.wrap(function()
@@ -76,11 +82,11 @@ function CheckPlayer(Player : Player, PData : table)
        end
    end)()
 
-   coroutine.wrap(function() -- До делать нормально
+   --[[coroutine.wrap(function() -- До делать нормально
         local _, Err = pcall(function()
             HttpService:PostAsync(Webhook,
                 HttpService:JSONEncode({
-                    content = `Зашел игрок: {Player.Name} \n ID игрока: {Player.UserId}, \n` -- Сделать PData -- DataStore игрока: \n {HttpService:JSONEncode(PData) -- Sql в веб версии онлайн
+                    --content = `Зашел игрок: {Player.Name} \n ID игрока: {Player.UserId}, \n` -- Сделать PData -- DataStore игрока: \n {HttpService:JSONEncode(PData) -- Sql в веб версии онлайн
                 })
             )
         end)
@@ -89,7 +95,7 @@ function CheckPlayer(Player : Player, PData : table)
             warn(Err)
         end
        -- print(HttpService:JSONDecode(HttpService:JSONEncode(PData))) Error Discord
-    end)()
+    end)()]]
 end
 
 function ResetDataPlayer(player : Player)
@@ -141,12 +147,16 @@ function UserPlayerRemove(player : Player)
                 HiveNumberOwner = "",
             }
 
-            UserPlayerData.AutoSaves[player.UserId] = nil
-            if not RunService:IsStudio() then
+            if RunService:IsStudio() then
+                profile.Data = {}
+                warn('Not Data Save')
+            else
+                warn('Data Save')
                 profile:Release()
+                print(profile.Data)
             end
-            print(profile.Data)
-            warn('Data Save')
+            UserPlayerData.AutoSaves[player.UserId] = nil
+
         end
     end)
 end

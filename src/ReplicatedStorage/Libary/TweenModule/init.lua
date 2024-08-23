@@ -119,19 +119,29 @@ function TweenModule:UseGui(UI : Frame, Pos : UDim2)
     Tw.Completed:Wait()
 end
 function TweenModule:UseCloseCamera(CameraStart : BasePart,CameraFinish : BasePart)
-    local TWCamera = TweenService:Create(CameraStart, TweenModule.TweenInfoTable['TweenCamera'], {
-        CFrame = CameraFinish
-    })
-    TWCamera:Play()
-    TWCamera.Completed:Wait()
+    local canMoveCamera = true
+    if canMoveCamera then
+        canMoveCamera = not canMoveCamera
+        local TWCamera = TweenService:Create(CameraStart, TweenModule.TweenInfoTable['TweenCamera'], {
+            CFrame = CameraFinish
+        })
+        TWCamera:Play()
+        TWCamera.Completed:Wait()
+        canMoveCamera = true
+    end
 end
 
 function TweenModule:UseCamera(CameraStart : BasePart,CameraFinish : BasePart)
-    local TWCamera = TweenService:Create(CameraStart, TweenModule.TweenInfoTable['TweenCamera'], {
-        CFrame = CameraFinish.CFrame
-    })
-    TWCamera:Play()
-    TWCamera.Completed:Wait()
+    local canMoveCamera = true
+    if canMoveCamera then
+        canMoveCamera = not canMoveCamera
+        local TWCamera = TweenService:Create(CameraStart, TweenModule.TweenInfoTable['TweenCamera'], {
+            CFrame = CameraFinish.CFrame
+        })
+        TWCamera:Play()
+        TWCamera.Completed:Wait()
+        canMoveCamera = true
+    end
 end
 
 function TweenModule:DestroyToken(NewToken : BasePart)

@@ -16,12 +16,19 @@ function ProfileData:DataNew()
 
     PData.Equipment = {
         Tool = "Shovel",
-        Bag = "Backpack",
+        Bag = "Pouch",
 
         Shops = {
             Tools = {['Shovel'] = true},
-            Bags = {['Backpack'] = true}
+            Bags = {['Pouch'] = true} -- исправить
         }
+    }
+
+    PData.Inventory = {
+        ['Sugar'] = 30,
+        ['Strawberry'] = 30,
+        ['Treat'] = 125,
+        ['Oil'] = 15
     }
 
     PData.FakeSettings = {
@@ -38,14 +45,14 @@ function ProfileData:DataNew()
         --Hive Settings
         HiveOwner = "",
         HiveNumberOwner = "",
-        
+
         OpenShop = false
     }
     PData.IStats = {
-        Honey = 1000000000000000000000,
+        Honey = 15000,
         DailyHoney = 0,
         Pollen = 0,
-        Capacity = 1000000000000000000000, --350
+        Capacity = 100000000000000000, --350
     }
 
    PData.BoostGame = {

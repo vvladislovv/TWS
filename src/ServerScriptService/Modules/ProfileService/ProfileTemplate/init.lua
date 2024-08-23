@@ -103,7 +103,6 @@ function ProfileData:DataNew()
 			Quest = 1,
 			Completed = false,
 		}
-        print(PData.Quests)
 	end
 
     return PData

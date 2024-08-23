@@ -8,7 +8,8 @@ local ShopsFrame : Frame = UIs:WaitForChild('Shops')
 local Camera = workspace.CurrentCamera
 local CameraNPC : Camera = nil
 local ModuleShop : table = nil
-
+local canMoveCamera = true
+local canMoveCamera2 = false
 -- // Libary
 local DataClient : ModuleScript = require(ReplicatedStorage.Libary.ClientData)
 local TweenModule : ModuleScript = require(ReplicatedStorage.Libary.TweenModule)
@@ -31,21 +32,25 @@ end
 
 function CameraShops(Button : BasePart)
     local PData : table = DataClient:GetClient()
-    if not PData.FakeSettings.OpenShop then
+    if not PData.FakeSettings.OpenShop and canMoveCamera then
+        canMoveCamera = false
+        Controls:Disable()
         PData.FakeSettings.OpenShop = true
-        DataClient:WriteDataServer({"FakeSettings","OpenShop",true})
         ShopVisual = #CameraFolder[Button:GetAttribute('Shop')]:GetChildren()
         CameraNPC = CameraFolder[Button:GetAttribute('Shop')]
         OldPosCamera = Camera.CFrame
         Camera.CameraType = Enum.CameraType.Scriptable
         GuiFrameShop("Start")
         GuiFrameShop("Update")
-        TweenModule:UseCamera(Camera,CameraNPC[IndexCamera])
-        Controls:Disable()
-    else
-        DataClient:WriteDataServer({"FakeSettings","OpenShop",false})
+        TweenModule:UseCamera(Camera, CameraNPC[IndexCamera])
+        DataClient:WriteDataServer({"FakeSettings", "OpenShop", true})
+        canMoveCamera2 = true
+    elseif PData.FakeSettings.OpenShop and canMoveCamera2 then
+        canMoveCamera2 = false
         CameraCloseShops()
+        DataClient:WriteDataServer({"FakeSettings", "OpenShop", false})
         PData.FakeSettings.OpenShop = false
+        canMoveCamera = true
     end
 end
 
@@ -53,8 +58,9 @@ function CameraCloseShops()
     IndexCamera = 1
     GuiFrameShop("Close")
     TweenModule:UseCloseCamera(Camera,OldPosCamera)
-    Controls:Enable()
     Camera.CameraType = Enum.CameraType.Custom
+    task.wait(0.1)
+    Controls:Enable()
 end
 
 function GuiFrameShop(Type : string)

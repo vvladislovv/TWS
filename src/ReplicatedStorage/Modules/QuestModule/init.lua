@@ -14,7 +14,8 @@ local Data : ModuleScript = require(ReplicatedStorage.Libary.ClientData)
 local Utils : ModuleScript = require(ReplicatedStorage.Libary.Utils)
 local Controls = require(Player.PlayerScripts.PlayerModule):GetControls()
 local OldPosCamera : Vector3? = nil
-
+local canMoveCamera = true
+local canMoveCamera2 = false
 local QuestModule = {}
 
 QuestModule.GetNPCIcon = function(NPC)
@@ -93,16 +94,20 @@ function GetQuestType(NPC : string)
 end
 
 function FinishQuest(NPC : string, TypeFunc : string)
-    TweenModule:UseCloseCamera(Camera,OldPosCamera)
-    TweenModule:UseGui(QuestUI,UDim2.new(0.324, 0,2, 0))
-    Controls:Enable()
-    Camera.CameraType = Enum.CameraType.Custom
-    if TypeFunc == "Skip" then
-        -- + Remote QuestServer
-    elseif TypeFunc == "Cancel" then
-    
-    elseif TypeFunc == "" then
-        Remote.ClaimQuest:FireServer(NPC)
+    if canMoveCamera2 then
+        canMoveCamera2 = false
+        TweenModule:UseCloseCamera(Camera,OldPosCamera)
+        TweenModule:UseGui(QuestUI,UDim2.new(0.324, 0,2, 0))
+        Controls:Enable()
+        Camera.CameraType = Enum.CameraType.Custom
+        canMoveCamera = true
+        if TypeFunc == "Skip" then
+            -- + Remote QuestServer
+        elseif TypeFunc == "Cancel" then
+        
+        elseif TypeFunc == "" then
+            Remote.ClaimQuest:FireServer(NPC)
+        end
     end
 end
 
@@ -179,7 +184,8 @@ function QuestModule:StartModule(ScriptButton : Part?)
         Dialogue = QuestData.Dialogues[GetQuestType(NPCName)]
     end
     local function CameraStart()
-        if not NPCData.Quests[NPCName].Talking then
+        if not NPCData.Quests[NPCName].Talking and canMoveCamera then
+            canMoveCamera = false
             NPCData.Quests[NPCName].Talking = true
 
             local CameraNPC : Camera = CameraFolder[NPCName]
@@ -189,6 +195,7 @@ function QuestModule:StartModule(ScriptButton : Part?)
             TweenModule:UseCamera(Camera,CameraNPC) -- CameraStart, CameraFinish
             Controls:Disable()
             TweenModule:UseGui(QuestUI,UDim2.new(0.324, 0,0.769, 0))
+            canMoveCamera2 = true
         end
     end
     CameraStart()
