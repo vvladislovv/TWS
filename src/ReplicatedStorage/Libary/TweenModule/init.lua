@@ -49,7 +49,7 @@ function TweenModule:SlotEffectFood(Slot : BasePart)
 end
 
 function TweenModule:CreateWaspHive(CFrameModel : CFrame, PosSlot : Attachment)
-    local endCFrame = CFrame.new(PosSlot.WorldCFrame.Position) * CFrame.Angles(0, math.rad(90), 0)
+    local endCFrame = CFrame.new(PosSlot.WorldCFrame.Position) * CFrame.Angles(0, 0, 0)
     TweenService:Create(CFrameModel.PrimaryPart, TweenModule.TweenInfoTable['HiveWaspCreate'], {CFrame = endCFrame}):Play()
 end
 

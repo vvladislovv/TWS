@@ -60,33 +60,6 @@ local ModuleTable = {} do
         end
     end
 
-    ModuleTable.WaspSpecif = function(Name : string)
-        local TableWasp = {
-            ['Test'] = {
-                Name = 'Test',
-                Icon = "rbxassetid://17180412078",
-                Rarity = "★★★★★★★★",
-                Color = "Colorless",
-                Ability = "",
-                AbilitySuper = "",
-                Energy = 20,
-                AnimFly = "",
-                Speed = 8,
-                Attack = 3,
-                Pollen = 15,
-                Converts = 100,
-                CollectTime = 0.5,
-                ConvertsTime = 0.5,
-                FavoriteFood = ""
-            }
-        }
-        for index, value in next, TableWasp do
-            if index == Name then
-                return value
-            end
-        end
-    end
-
     ModuleTable.Items = function(Name : string)
         local TableItems = {
             ['Strawberry'] = {

@@ -82,7 +82,7 @@ function ProfileData:DataNew()
         
         WaspSlotHive = {
             [1] = {
-                Name  = 'Test',
+                Name  = 'Test Wasp',
                 Level = 1,
                 Rarity = "★",
                 Color = "Pupler",

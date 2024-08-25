@@ -6,8 +6,6 @@ local CountriesModule = require(script.Countries)
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local ChatService = require(ServerScriptService:WaitForChild("ChatServiceRunner").ChatService)
-print(ChatService)
-
 
 local function speakerAdded(speakerName)
     task.spawn(function()

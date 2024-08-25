@@ -8,7 +8,7 @@ local TweenModule : ModuleScript = require(ReplicatedStorage.Libary.TweenModule)
 local ModuleTable : ModuleScript = require(ReplicatedStorage.Libary.ModuleTable)
 local HiveFolde : Folder = workspace.GameSettings.Hives
 local Remotes : Folder = ReplicatedStorage.Remotes
-
+local WaspModule : ModuleScript = require(script.Parent.WaspModule)
 
 
 function HiveOwner(Player: Player, Hive : Part, Button : Part)
@@ -44,7 +44,7 @@ function CheckSlotWasp(CheckSlot : number, Hive : Folder, PData : table)
             local GetTableRarity : table = ModuleTable.Rarity(Rarity)
 
             if GetTableRarity ~= nil then
-                Hive.Slots[NumberSlot].Down.SurfaceGui.ImageLabel.Image = ModuleTable.WaspSpecif(GetSlot.Name).Icon
+                Hive.Slots[NumberSlot].Down.SurfaceGui.ImageLabel.Image = require(workspace.GameSettings.Wasps[PData.BasicSettings.PlayerName][GetSlot.Name]).Icon
                 Hive.Slots[NumberSlot].Down.Color = GetTableRarity[2]
             end
             Hive.Slots[NumberSlot]:SetAttribute('NameWasp',GetSlot.Name)
@@ -59,8 +59,7 @@ function HiveServerModule:SpawnWaspSlot(WaspName : string, Hive : Folder, CheckS
     local WaspModel : Script = ReplicatedStorage.Wasps[WaspName]:Clone()
     WaspModel.Parent = workspace.GameSettings.Wasps[PData.BasicSettings.PlayerName]
     local PosSlot : Instance = Hive.Slots[CheckSlot].Down.SpawnWasp
-    WaspModel.Model:SetPrimaryPartCFrame(CFrame.new(PosSlot.WorldCFrame.Position.X,PosSlot.WorldCFrame.Position.Y,PosSlot.WorldCFrame.Position.Z-3) * CFrame.Angles(0,math.rad(90),0)) 
-    TweenModule:CreateWaspHive(WaspModel.Model,PosSlot)
+    WaspModule:NewWasp(PData,PosSlot,WaspModel,Hive)
 end
 
 function SpawnSlotHive(Hive : Folder, PData : table)
