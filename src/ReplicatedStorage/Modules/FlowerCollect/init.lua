@@ -10,6 +10,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Remotes : Folder = ReplicatedStorage.Remotes
 GetField = Remotes.GetField:InvokeServer()
 
+local TableDownCollecter : table = {}
 local FlowerCollect = {}
 
 local function GetRotation()
@@ -94,21 +95,19 @@ function FlowerCollect:Regeneration(Field)
     local InfoFieldGame = GetField[Field.Name]
         task.spawn(function()
             while Field do task.wait(math.random(2,6))
-                for i, Pollen in pairs(Field:GetChildren()) do
-                    if Pollen:IsA("BasePart") then
-                    InfoFieldGame = GetField.Flowers[Pollen:GetAttribute('ID')]
-                        if math.floor(Pollen.Position.Y) <= InfoFieldGame.MaxP then -- Возможны баги
-                            local ToMaxFlower = tonumber(InfoFieldGame.MaxP - Pollen.Position.Y)
-                            local FlowerPos = Pollen.Position + Vector3.new(0, ToMaxFlower, 0)
-                            local FlowerPosTime = Pollen.Position + Vector3.new(0,InfoFieldGame.RegenFlower,0)
-                            TweenModule:RegenUp(Pollen,ToMaxFlower,InfoFieldGame,FlowerPos,FlowerPosTime)
-                        end
-                    end 
+                for i, Flower in pairs(Field:GetChildren()) do
+                    InfoFieldGame = GetField.Flowers[Flower:GetAttribute('ID')]
+                    if Flower.Position.Y < InfoFieldGame.MaxP then
+                        local ToMaxFlower = tonumber(InfoFieldGame.MaxP - Flower.Position.Y)
+                        local FlowerPos = Flower.Position + Vector3.new(0, ToMaxFlower, 0)
+                        local FlowerPosTime = Flower.Position + Vector3.new(0,InfoFieldGame.RegenFlower,0)
+                        TweenModule:TexturePart(Flower, (InfoFieldGame.MaxP - Flower.Position.Y)/2)
+                        TweenModule:RegenUp(Flower,ToMaxFlower,InfoFieldGame,FlowerPos,FlowerPosTime)
+                    end
                 end
             end
         end)
 end
-
 
 
 function FlowerEffect(Flower : Part)
@@ -117,11 +116,17 @@ function FlowerEffect(Flower : Part)
     Flower.ParticleEmitter.Enabled = false
 end
 
-function DownFlower(Player,Flower : Part, DecAm : Vector3)
-    local FlowerPos = Flower.Position - Vector3.new(0,DecAm,0)
+function DownFlower(Player : Player,Flower : Part, DecAm : Vector3)
+    local FlowerPos : Vector3 = (Flower.Position - Vector3.new(0,DecAm,0))
     local infofield = GetField.Flowers[Flower:GetAttribute('ID')]
-    if (Flower.Position.Y - infofield.MinP) > 0.25 then -- исправить баг 
+
+    TweenModule:TexturePart(Flower, (infofield.MaxP-Flower.Position.Y)/1.95)
+    if FlowerPos.Y > infofield.MinP then
         TweenModule:FlowerDown(Flower,FlowerPos)
+     elseif FlowerPos.Y <= infofield.MinP then
+        local ResetPos : Vector3 = Vector3.new(Flower.Position.X,infofield.MinP,Flower.Position.Z)
+
+        TweenModule:FlowerDown(Flower,ResetPos)
     end
 end
 

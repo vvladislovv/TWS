@@ -6,15 +6,16 @@ TweenModule.TweenInfoTable = {
     ['TweenInfo11'] = TweenInfo.new(0.7, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
     ['TweenInfoSlot'] = TweenInfo.new(0.45,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),
     ['HiveWaspCreate'] = TweenInfo.new(0.45,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
-    ['FlowerDown'] = TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
-    ['FlowerUp'] = TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In),
+    ['FlowerDown'] = TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+    ['FlowerUp'] = TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
     ['TweenCamera'] = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['TokenUpField'] = TweenInfo.new(1.5,Enum.EasingStyle.Elastic,Enum.EasingDirection.Out),
     ['TweenRotation'] = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ["DestroyToken"] = TweenInfo.new(1),
     ['TweenTouched'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-    ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+    ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+    ['TextureParts'] = TweenInfo.new(0.25,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
 }
 
 
@@ -103,6 +104,12 @@ function TweenModule:RegenUp(Pollen : BasePart,ToMaxFlower : Vector3,InfoFieldGa
         Pollen.ParticleEmitter.Enabled = false
         TweenService:Create(Pollen, TweenModule.TweenInfoTable['FlowerUp'], {Position = FlowerPosTime}):Play()
     end
+end
+
+function TweenModule:TexturePart(Part : BasePart, TransNumber : number)
+    print(Part)
+    print(TransNumber)
+    TweenService:Create(Part:FindFirstChild('TopTexture'), TweenModule.TweenInfoTable['TextureParts'], {Transparency = TransNumber}):Play()
 end
 
 function TweenModule:SizeUp(VP: Frame)
