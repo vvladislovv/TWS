@@ -49,8 +49,8 @@ function LoadUserData(player : Player)
                 CheckPlayer(player, UserPlayerData.Profiles[player].Data)
                 UserPlayerData.Profiles[player].Data.BasicSettings.PlayerName = player.Name
                 UserPlayerData.Profiles[player].Data.BasicSettings.Loaded = true
+               --print(UserPlayerData.Profiles[player].Data)
                 UserPlayerData.AutoSaves[player.Name] = player
-                CheckPlayer(player, UserPlayerData.Profiles[player].Data)
                 Remotes.StartSystems:Fire(player,UserPlayerData.Profiles[player].Data)
             else
                 profile:Release()
