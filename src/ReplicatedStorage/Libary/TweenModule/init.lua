@@ -15,7 +15,9 @@ TweenModule.TweenInfoTable = {
     ['TweenTouched'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-    ['TextureParts'] = TweenInfo.new(0.25,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+    ['TextureParts'] = TweenInfo.new(0.25,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+    ['TweenPosWasp'] = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut),
+    ['WaspFlyPos'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
 }
 
 
@@ -107,8 +109,6 @@ function TweenModule:RegenUp(Pollen : BasePart,ToMaxFlower : Vector3,InfoFieldGa
 end
 
 function TweenModule:TexturePart(Part : BasePart, TransNumber : number)
-    print(Part)
-    print(TransNumber)
     TweenService:Create(Part:FindFirstChild('TopTexture'), TweenModule.TweenInfoTable['TextureParts'], {Transparency = TransNumber}):Play()
 end
 
@@ -213,7 +213,19 @@ function TweenModule:UseGuiFrame(GetFrame : Frame, Pos : UDim2)
 end
 
 function TweenModule:AmiteButton(GetFrame : Frame, Pos : UDim2)
-    TweenModule:Create(GetFrame,TweenModule.TweenInfoTable['AnimateButton'], {Position = Pos})
+    TweenService:Create(GetFrame,TweenModule.TweenInfoTable['AnimateButton'], {Position = Pos})
+end
+
+function TweenModule:WaspPosition(Model : BasePart, newPos : Vector3?)
+    TweenService:Create(Model, TweenModule.TweenInfoTable['TweenPosWasp'], {Position = newPos}):Play()
+end
+
+function TweenModule:WaspOrintation(AO : AlignOrientation, PosCFrame : CFrame)
+    TweenService:Create(AO, TweenModule.TweenInfoTable['TweenPosWasp'], {CFrame = PosCFrame}):Play()
+end
+
+function TweenModule:FlyWasp(Part : BasePart, Pos : CFrame)
+    TweenService:Create(Part, TweenModule.TweenInfoTable['WaspFlyPos'],{CFrame = Pos}):Play()
 end
 
 return TweenModule
