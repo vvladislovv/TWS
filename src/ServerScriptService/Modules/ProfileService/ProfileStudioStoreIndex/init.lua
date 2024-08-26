@@ -45,8 +45,12 @@ function ProfileData:DataNew()
         --Hive Settings
         HiveOwner = "",
         HiveNumberOwner = "",
+        --SHOP settings
+        OpenShop = false,
 
-        OpenShop = false
+        --Wasp settings
+        Making = false,
+        Attack = false,
     }
     PData.IStats = {
         Honey = 15000,
@@ -79,17 +83,22 @@ function ProfileData:DataNew()
     
     PData.HiveModule = {
         HiveSlotAll = 1, -- PlayerSlots
-        
-        WaspSlotHive = {
-            [1] = {
-                Name  = 'Test Wasp',
-                Level = 1,
-                Rarity = "★",
-                Color = "Pupler",
-				Band = 0,
-            },
-        }
+        HiveAllGame = 33,
     }
+    PData.Wasps = {}
+    for slot = 1,1 do
+        PData.Wasps[slot] = {
+            Name = "Test Wasp",
+            Color = "Purple",
+            Rarity = "★",
+            Attack = 0,
+            Slot = slot,
+            Energy = 1,
+            Bond = 0,
+            Level = 1,
+        }
+    end
+
     PData.SettingsMenu = {
         ['Pollen Text'] = true
     }

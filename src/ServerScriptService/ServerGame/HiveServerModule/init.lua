@@ -25,7 +25,7 @@ function HiveOwner(Player: Player, Hive : Part, Button : Part)
         Hive.Platform.Up.SurfaceGui.Tags.Text = Player.DisplayName
         Hive.Platform.Down.Highlight.Enabled = false
         Hive.NamePlayerHive.NameHive.TextLabel.Text = Player.DisplayName
-        Hive.NamePlayerHive.SlotHive.TextLabel.Text = `{PData.HiveModule.HiveSlotAll}/33`
+        Hive.NamePlayerHive.SlotHive.TextLabel.Text = `{PData.HiveModule.HiveSlotAll}/{PData.HiveModule.HiveAllGame}`
         
         coroutine.wrap(function()
             Remotes.HiveReturnClient:FireClient(Player,Button,PData,Hive)
@@ -36,7 +36,7 @@ function HiveOwner(Player: Player, Hive : Part, Button : Part)
 end
 
 function CheckSlotWasp(CheckSlot : number, Hive : Folder, PData : table)
-    for NumberSlot, GetSlot in next, PData.HiveModule.WaspSlotHive do
+    for NumberSlot, GetSlot in next, PData.Wasps do
         if NumberSlot == CheckSlot then
             HiveServerModule:SpawnWaspSlot(GetSlot.Name, Hive, CheckSlot, PData)
 
@@ -59,7 +59,7 @@ function HiveServerModule:SpawnWaspSlot(WaspName : string, Hive : Folder, CheckS
     local WaspModel : Script = ReplicatedStorage.Wasps[WaspName]:Clone()
     WaspModel.Parent = workspace.GameSettings.Wasps[PData.BasicSettings.PlayerName]
     local PosSlot : Instance = Hive.Slots[CheckSlot].Down.SpawnWasp
-    WaspModule:NewWasp(PData,PosSlot,WaspModel,Hive)
+    WaspModule.NewWasp(PData,PosSlot,WaspModel,CheckSlot)
 end
 
 function SpawnSlotHive(Hive : Folder, PData : table)
@@ -93,7 +93,7 @@ function HivePlayerLeave(Player : Player) -- Folder -> player -> Bees + Bag new 
 
             local function SpawnHiveSlot()
                 if index:GetAttribute('Owner') == PData.FakeSettings.HiveOwner then
-                    for NumberSlot, GetSlot in next, PData.HiveModule.WaspSlotHive do
+                    for NumberSlot, GetSlot in next, PData.Wasps do
                         local CheckSlotPlayer : number = PData.HiveModule.HiveSlotAll
                         local CheckSlot : number = 0
                         if CheckSlotPlayer ~= CheckSlot then
