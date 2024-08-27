@@ -52,7 +52,6 @@ function Utils:AnimateText(DialogueFrame : Frame, Text : string)
         task.wait(0.01)
     end
     DialogueFrame.TextLabel.MaxVisibleGraphemes = -1
-
 end
 
 function Utils:ChanceRandome(TableChance : number )

@@ -17,7 +17,7 @@ TweenModule.TweenInfoTable = {
     ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
     ['TextureParts'] = TweenInfo.new(0.25,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
     ['TweenPosWasp'] = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut),
-    ['WaspFlyPos'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+    ['WaspFlyPos'] = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
 }
 
 

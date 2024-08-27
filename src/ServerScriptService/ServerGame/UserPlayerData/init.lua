@@ -70,6 +70,7 @@ function CheckPlayer(Player : Player, PData : table)
     end
 
    coroutine.wrap(function()
+        task.wait()
        for _, GetTable in next, ModuleTable.PlayerGame.BanPlayer do
            if GetTable == Player.Name then
             if not PData.BasicSettings.Banned then
@@ -167,7 +168,6 @@ game.ReplicatedStorage.Remotes.PlayerClientData.OnServerInvoke = function(client
 end
 
 do
-
     game.Players.PlayerAdded:Connect(LoadUserData)
     game.Players.PlayerRemoving:Connect(UserPlayerRemove)
     Remotes.ClientOnServer.OnServerEvent:Connect(SetWriteData)
