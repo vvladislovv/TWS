@@ -101,12 +101,14 @@ function HivePlayerLeave(Player : Player) -- Folder -> player -> Bees + Bag new 
                                 CheckSlot += 1
                                 local PosSlot : Instance = index.Slots[CheckSlot].Down.SpawnWasp
                                 TweenModule:DestroySlotHive(index, CheckSlot)
-                                workspace.GameSettings.Wasps[Player.Name][GetSlot.Name].Model:SetPrimaryPartCFrame(CFrame.new(PosSlot.WorldCFrame.Position.X,PosSlot.WorldCFrame.Position.Y,PosSlot.WorldCFrame.Position.Z-3) * CFrame.Angles(0,math.rad(90),0))
+                                --workspace.GameSettings.Wasps:FindFirstChild(Player.Name)[GetSlot.Name].Model:SetPrimaryPartCFrame(CFrame.new(PosSlot.WorldCFrame.Position.X,PosSlot.WorldCFrame.Position.Y,PosSlot.WorldCFrame.Position.Z-3) * CFrame.Angles(0,math.rad(90),0))
 
                                 coroutine.wrap(function()
                                     if CheckSlot == CheckSlotPlayer then
                                         task.wait(0.5)
-                                        workspace.GameSettings.Wasps[Player.Name]:Destroy()
+                                        if workspace.GameSettings.Wasps:FindFirstChild(Player.Name) then
+                                            workspace.GameSettings.Wasps:FindFirstChild(Player.Name):Destroy()
+                                        end
                                      end
                                 end)()
 

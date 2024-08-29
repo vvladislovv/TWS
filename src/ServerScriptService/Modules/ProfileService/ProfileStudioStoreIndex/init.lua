@@ -86,14 +86,15 @@ function ProfileData:DataNew()
         HiveAllGame = 33,
     }
     PData.Wasps = {}
-    for slot = 1,1 do
+    for slot = 1, PData.HiveModule.HiveAllGame do
         PData.Wasps[slot] = {
             Name = "Test Wasp",
             Color = "Purple",
             Rarity = "★",
             Attack = 0,
             Slot = slot,
-            Energy = 0,
+            Energy = 1,
+            ELimit = 10,
             Bond = 0,
             Level = 1,
         }

@@ -16,7 +16,7 @@ TweenModule.TweenInfoTable = {
     ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
     ['TextureParts'] = TweenInfo.new(0.25,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-    ['TweenPosWasp'] = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut),
+    ['TweenPosWasp'] = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut),
     ['WaspFlyPos'] = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
 }
 
@@ -51,7 +51,7 @@ function TweenModule:SlotEffectFood(Slot : BasePart)
 end
 
 function TweenModule:CreateWaspHive(CFrameModel : CFrame, PosSlot : Attachment)
-    local endCFrame = CFrame.new(PosSlot.WorldCFrame.Position) * CFrame.Angles(0, 0, 0)
+    local endCFrame = CFrame.new(PosSlot.WorldCFrame.Position) 
     TweenService:Create(CFrameModel.PrimaryPart, TweenModule.TweenInfoTable['HiveWaspCreate'], {CFrame = endCFrame}):Play()
 end
 
