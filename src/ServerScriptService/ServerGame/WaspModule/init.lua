@@ -1,18 +1,35 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes : Folder = ReplicatedStorage.Remotes
 local FolderWasp : Folder = workspace.GameSettings.Wasps
-local WaspModule : ModuleScript? = ReplicatedStorage.Wasps
+local WaspModule1 : ModuleScript? = ReplicatedStorage.Wasps
 local PosStart : boolean = true
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService('TweenService')
 --// Libary
+local PosBooleChr : boolean = false
+local PosBooleNow : boolean  = false
 local TweenModule : ModuleScript = require(ReplicatedStorage.Libary.TweenModule)
 local Data : ModuleScript = require(script.Parent.UserPlayerData)
 local Utils : ModuleScript = require(ReplicatedStorage.Libary.Utils)
-local ComeMe : boolean?
 local WaspModule = {}
 WaspModule.__index = WaspModule
 
+
+function WaspModule:LookVectorCharacter(Settings : table)
+    local Character = Settings.Character
+    local PartRandome : BasePart = Settings.Model:FindFirstChild('PartRandome')
+
+    task.spawn(function()
+        while true do task.wait()
+            if Settings.LookVector then
+                if PartRandome ~= nil then
+                    PartRandome.CFrame = CFrame.new(PartRandome.Position, PartRandome.Position + Character.HumanoidRootPart.CFrame.LookVector) * CFrame.Angles(0,math.rad(-90),0) 
+                end
+            end
+        end
+    end)
+
+end
 
 function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : ModuleScript,CheckSlot : number) -- до писать скрипт сделать так чтобы позиция была при вылета как у кублиона
     local self = setmetatable({}, WaspModule)
@@ -22,9 +39,13 @@ function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : Modul
     self.SlotPos = PosSlot
     self.WaspData = PData.Wasps[CheckSlot]
     self.Model = WaspModel.Model
-    WaspModel.Model:SetPrimaryPartCFrame(CFrame.new(PosSlot.WorldCFrame.Position.X,PosSlot.WorldCFrame.Position.Y,PosSlot.WorldCFrame.Position.Z))
-
-    TweenModule:CreateWaspHive(WaspModel.Model,PosSlot)
+    self.SpeedWasp = self.WaspData.Speed
+    WaspModel.Model:SetPrimaryPartCFrame(CFrame.new(PosSlot.WorldCFrame.Position.X,PosSlot.WorldCFrame.Position.Y,PosSlot.WorldCFrame.Position.Z) * CFrame.Angles(0,math.rad(180),0))
+    
+    --// Settings engine
+    local AlignPosition : AlignPosition = WaspModel.Model.Primary:FindFirstChild('AlignPosition')
+    AlignPosition.MaxVelocity = self.WaspData.Speed
+    AlignPosition.Responsiveness = self.WaspData.Speed / 2
 
     if not WaspModule.SettingTable then
         WaspModule.SettingTable = {}
@@ -34,7 +55,7 @@ function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : Modul
 
     task.wait(0.5)
     --// Function One Start
-   -- WaspModule:AIPos(PData.Wasps[CheckSlot])
+    WaspModule:AIPos(PData.Wasps[CheckSlot])
     return self
 end
 
@@ -44,11 +65,14 @@ end
 
 function WaspModule:ComeToMe(TableWaspSettings : table)-- вылет с улья и подлет к персонажу
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
-    local NewPos : Vector3? = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-10,10), math.random(-0.5,1), math.random(-10,10))
+    local NewPos : Vector3? = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-5,5), math.random(-0.5,1), math.random(-5,5))
+    PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
     PartRandome.Position = NewPos
-    --TweenModule:WaspPosition(Primary, NewPos)
-    
-    return true
+    task.wait(1)
+    TableWaspSettings.LookVector = true
+    self:LookVectorCharacter(TableWaspSettings)
+    PosBooleNow = true
+    PosBooleChr = true
 end
 
 function WaspModule:Sleep(TableWaspSettings : table) -- Sleep Wasp
@@ -58,34 +82,47 @@ function WaspModule:Sleep(TableWaspSettings : table) -- Sleep Wasp
         PartRandome.CFrame *= CFrame.Angles(0,math.rad(60),0)
         PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(-90))
 
-    local TimeSleep : number = math.round(TableWaspSettings.WaspData.ELimit / 2) -- Какое ожидание будет 
+        local TimeSleep : number = math.round(TableWaspSettings.WaspData.ELimit / 2) -- Какое ожидание будет 
     
-    task.wait(TimeSleep) -- время сна
-    TableWaspSettings.WaspData.Energy = TableWaspSettings.WaspData.ELimit
-    print("sleep stop")
+        task.wait(TimeSleep) -- время сна
+        TableWaspSettings.WaspData.Energy = TableWaspSettings.WaspData.ELimit
+        print("sleep stop")
     end
 end
 
 function WaspModule:AIPosRandom(settings : table) -- рандомная позиция осе
     local NewPos : Vector3? 
-    local BoalNewPos : boolean = false
     local TableWaspSettings : table = settings.TypeTable
-
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
-    local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
     if settings ~= nil then task.wait()
         if settings.Type == ">" then -- если полный рюкзак 
-        --print('a')
-        elseif settings.Type == "<=" then -- если не полный рюкзак
-            if not BoalNewPos then
-                print('f')
-                BoalNewPos = true
-              --  NewPos = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-10,10), math.random(-1,2), math.random(-10,10))
-              --  PartRandome.Position = NewPos
+            if PosBooleChr and PartRandome ~= nil then
+                print('s')
+                PosBooleChr = not PosBooleChr
+                TableWaspSettings.LookVector = false
 
-                --PartRandome.CFrame *= CFrame.new(NewPos,Primary.Position) * CFrame.Angles(0, math.rad(90),0)
-                task.wait(6)
-                BoalNewPos = false
+                NewPos = TableWaspSettings.Character.HumanoidRootPart.Position + TableWaspSettings.FlyPos
+                PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
+                PartRandome.Position = NewPos
+                task.wait(1.5)
+                TableWaspSettings.LookVector = true
+                PosBooleChr = true
+            end
+        elseif settings.Type == "<=" then -- если не полный рюкзак
+            if PosBooleNow and PartRandome ~= nil then
+
+                PosBooleNow = not PosBooleNow
+                TableWaspSettings.LookVector = false
+                NewPos = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-8,8), math.random(-0.5,2), math.random(-8,8))
+                PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
+                PartRandome.Position = NewPos
+
+                task.spawn(function() task.wait(0.5)
+                    TableWaspSettings.LookVector = true
+                end)
+
+                task.wait(3)
+                PosBooleNow = true
             end
         end
     end
@@ -105,6 +142,7 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
             local character = player.Character or player.CharacterAdded:Wait()
             self.SettingTable[NameWasp.Name].Character = character
             self.SettingTable[NameWasp.Name].Model.Primary:SetNetworkOwner(player)
+            self.SettingTable[NameWasp.Name].LookVector = false
             continue
         end
         
@@ -112,29 +150,26 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
         self:ComeToMe(TableWaspSettings)
         Remotes.ClientWasp:FireAllClients(TableWaspSettings)
 
-            --[[while true do task.wait()
+        while true do task.wait()
             if TableWaspSettings.Character and TableWaspSettings.Model then
-                if TableWaspSettings.WaspData.Energy <= 0 then
+                if TableWaspSettings.WaspData.Energy <= 0 then -- Function Sleeps
                     self:Sleep(TableWaspSettings)
                 elseif TableWaspSettings.WaspData.Energy > 0 then
-               -- print(ComeMe)
-                    if ComeMe ~= nil then
                         if TableWaspSettings.PlayerData.FakeSettings.Attack then
                             self:AttackMobs();
                         else
                             if not TableWaspSettings.PlayerData.FakeSettings.Making then
-
                                 if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" and TableWaspSettings.PlayerData.IStats.Pollen < TableWaspSettings.PlayerData.IStats.Capacity then
                                     self:CollectPollen()
                                 elseif TableWaspSettings.PlayerData.FakeSettings.Field == "" or TableWaspSettings.PlayerData.IStats.Pollen >= TableWaspSettings.PlayerData.IStats.Capacity then
                                     if TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude > 0 then
-                                       -- self:AIPosRandom({
-                                     ---       Type = ">", TypeTable = TableWaspSettings
-                                      --  });
+                                        self:AIPosRandom({
+                                            Type = ">", TypeTable = TableWaspSettings
+                                        });
                                     elseif TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude <= 0 then
-                                      --  self:AIPosRandom({
-                                      --      Type = "<=", TypeTable = TableWaspSettings
-                                      --  });
+                                        self:AIPosRandom({
+                                            Type = "<=", TypeTable = TableWaspSettings
+                                        });
                                     end
                                     
                                 end
@@ -143,12 +178,9 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
                                 self:MakeHoney();
                             end
                         end
-                    else
-                        ComeMe = self:ComeToMe(TableWaspSettings)
                     end
                 end
             end
-        end]]
         end)
 
 

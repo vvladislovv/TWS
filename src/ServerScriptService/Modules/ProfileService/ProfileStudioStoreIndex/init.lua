@@ -93,6 +93,7 @@ function ProfileData:DataNew()
             Rarity = "★",
             Attack = 0,
             Slot = slot,
+            Speed = 15,
             Energy = 1,
             ELimit = 10,
             Bond = 0,

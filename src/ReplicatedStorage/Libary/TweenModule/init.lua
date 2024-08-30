@@ -50,11 +50,6 @@ function TweenModule:SlotEffectFood(Slot : BasePart)
     TweenService:Create(Slot.Down, TweenModule.TweenInfoTable['TweenInfoSlot'], {Color = Color3.fromRGB(61, 243, 92)}):Play()
 end
 
-function TweenModule:CreateWaspHive(CFrameModel : CFrame, PosSlot : Attachment)
-    local endCFrame = CFrame.new(PosSlot.WorldCFrame.Position) 
-    TweenService:Create(CFrameModel.PrimaryPart, TweenModule.TweenInfoTable['HiveWaspCreate'], {CFrame = endCFrame}):Play()
-end
-
 function  TweenModule:SlotEffectFoodOff(Slot : BasePart, ColorSlot : Color3)
     TweenService:Create(Slot.Down, TweenModule.TweenInfoTable['TweenInfoSlot'], {Color = ColorSlot[2]}):Play()
 end

@@ -61,7 +61,7 @@ function KeyCode(input, GPE)
 
         local target = Mouse.Target
         if input.UserInputType == Enum.UserInputType.MouseButton1 then -- Mouse Click Button
-            if ScriptButton ~= nil then
+            if ScriptButton ~= nil and target ~= nil then
                 if ScriptButton:GetAttribute('OpenButton') and target.Name == ScriptButton.Name then
                     AnimKeyCode(ScriptButton, input)
                     if ScriptButton.Name == "Hive" then
