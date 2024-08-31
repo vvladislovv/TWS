@@ -17,13 +17,19 @@ function FlowerDataBoots(PData : table, Coollected : number, FlowerTable : table
         Coollected *= (PData.BoostGame.PlayerBoost[FlowerTable.Color..' Pollen'] / 100)
         Coollected *= (PData.BoostGame.PlayerBoost[PData.FakeSettings.OldField] / 100)
 
-        if TSS.Boots then
-            Coollected *= (PData.BoostGame.PlayerBoost['Movement Collection'])
+        if TSS.Type == "Boost" then
+            Coollected *= PData.BoostGame.PlayerBoost['Movement Collection']
         end
     end
 
     if FlowerTable.Color == TSS.Color then
         Coollected *= TSS.ColorMutltiplier
+    end
+
+    if TSS.Type == "Wasp" then
+        Coollected *= PData.BoostGame.PlayerBoost['Pollen From Bees']/100 
+    elseif TSS.Type == "Tool" then
+        Coollected *= PData.BoostGame.PlayerBoost['Pollen From Tools']/100 
     end
 
     if FlowerTable.Stat.Value == "1" then
@@ -122,6 +128,10 @@ end
 
 Remotes.CollercterFlower.OnServerEvent:Connect(CollectFlower)
 
+function FlowerServerCollect:ConnectWasp(Player,Flower,Tabss)
+    CollectFlower(Player, Flower, Tabss)
+end
+
 coroutine.wrap(function()
     game.Players.PlayerAdded:Connect(function(Player : Player)
         FlowerServerCollect.FlowerPlayerTable[Player.Name] = {White = 0, Blue = 0, Honey = 0,  Pupler = 0}
@@ -139,7 +149,11 @@ for _, FieldFolder in next, workspace.GameSettings.FieldZone:GetChildren() do
         local PData : table = Data:Get(Player)
         PData.FakeSettings.Field = GenerationField.Correspondant[FieldFolder.Name]
         PData.FakeSettings.OldField = FieldFolder.Name
+    end)
 
+    ZonePlus.playerExited:Connect(function(Player : Player)
+        local PData : table = Data:Get(Player)
+        PData.FakeSettings.Field = ""
     end)
 
 end

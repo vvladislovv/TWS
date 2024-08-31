@@ -10,6 +10,7 @@ return {
     AnimFly = "Basic",
 
 	FavoriteFood = "Seed",
+	Type = "Wasp",
 
 	Attack = 5,
 	Speed = 14,
@@ -19,11 +20,9 @@ return {
     Ability = {"Bomb"},
     AbilitySuper = "",
 	
-	ConvertsTime = 2,
+	ConvertsTime = 5,
 	Converts = 100,
-	
-	StatsModule = {
-		Collecting = 25,
-		Color = "White",
-	},
+	SizeCollect = 0.25,
+	CollectField = math.random(15,35),
+
 }

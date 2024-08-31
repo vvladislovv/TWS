@@ -104,8 +104,12 @@ function ProfileData:DataNew()
 
             ['Movement Collection'] = 100,
 
+            ["Pollen From Bees"] = 100,
+            ["Pollen From Tools"] = 100,
             --// Field Boost 
-            ['SunflowerPath1'] = 100            
+            ['SunflowerPath1'] = 100   
+            
+            
         },
         TokenBoost = {},
         CraftBoost = {}
@@ -124,7 +128,7 @@ function ProfileData:DataNew()
             Attack = 0,
             Slot = slot,
             Speed = 15,
-            Energy = 1,
+            Energy = 15,
             ELimit = 10,
             Bond = 0,
             Level = 1,

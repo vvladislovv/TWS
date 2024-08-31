@@ -51,7 +51,6 @@ function FlowerCollect:FlowerRayCost(TSS : table)
     local _,err = pcall(function()
         coroutine.wrap(function()
             if Rayy.Name == "Flower" then
-
                 if ToolStamps:IsA('Model') then
                     ToolStamps:PivotTo(CFrame.new(Rayy.Position + Vector3.new(0,3,0)) * GetRotation())
                 else
@@ -64,7 +63,6 @@ function FlowerCollect:FlowerRayCost(TSS : table)
                     if OBJ.Name ~= "Root" then
                         local RayFlower : Ray = Ray.new(OBJ.Position, Vector3.new(0,-12,0))
                         local Ray2 : table = workspace:FindPartOnRayWithWhitelist(RayFlower, {workspace.GameSettings.Fields})
-
                         if Ray2.Name == "Flower" and PData.FakeSettings.Field ~= "" then
                             Remotes.CollercterFlower:FireServer(Ray2, TSS)
                         end
@@ -73,8 +71,7 @@ function FlowerCollect:FlowerRayCost(TSS : table)
             else
                 local RayFlower3 : Ray = Ray.new(ToolStamps.Position, Vector3.new(0,-12,0))
                 local Ray3 : table = workspace:FindPartOnRayWithWhitelist(RayFlower3, {workspace.GameSettings.Fields})
-                
-                if tostring(Ray3.Name) == "Flower" and PData.FakeSettings.Field ~= "" then
+                if Ray3.Name == "Flower" and PData.FakeSettings.Field ~= "" then
                     Remotes.CollercterFlower:FireServer(Ray3, TSS)
                 end
             end

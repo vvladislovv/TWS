@@ -5,9 +5,11 @@ local WaspModule1 : ModuleScript? = ReplicatedStorage.Wasps
 local PosStart : boolean = true
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService('TweenService')
---// Libary
+
 local PosBooleChr : boolean = false
 local PosBooleNow : boolean  = false
+--// Libary
+local FlowerCollect : ModuleScript = require(script.Parent.FlowerServerCollect)
 local TweenModule : ModuleScript = require(ReplicatedStorage.Libary.TweenModule)
 local Data : ModuleScript = require(script.Parent.UserPlayerData)
 local Utils : ModuleScript = require(ReplicatedStorage.Libary.Utils)
@@ -59,35 +61,57 @@ function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : Modul
     return self
 end
 
-function WaspModule:CollectPollen(TableWaspSettings : table) -- Проблема тут 
+function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать токены
     local Deb : boolean = false
+    local DebFlower : boolean = false
     local Character : CharacterAppearance = TableWaspSettings.Character
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
 
-    local NewPos : Vector3? 
+    local NewPos : Vector3?
     local FieldTable : table = workspace.GameSettings.Fields:FindFirstChild(TableWaspSettings.PlayerData.FakeSettings.OldField):GetChildren()
     local Flower : number = FieldTable[math.random(1, #FieldTable)]
+
     if not Deb then
         Deb = true
         TableWaspSettings.LookVector = false
         if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 20 and TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
             NewPos = Flower.Position + Vector3.new(0,2,0)
-            PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(1))
-            PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
+            PartRandome.CFrame = CFrame.new(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
             PartRandome.Position = NewPos
+            print(TableWaspSettings.PlayerData.FakeSettings.Field)
             if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
-                if PartRandome.Position == NewPos then
-                    print('a')
-                else
-                    print('f')
-                end
-                PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
-                task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
-                task.wait(0.35)
-                PartRandome.CFrame = CFrame.Angles(0,0,0)
-                Deb = false
+
+                task.spawn(function()
+                    while true do task.wait()
+                        local Distation : number = (PartRandome.Position - Primary.Position).Magnitude
+                        if Distation < 0.5 then
+                            if not DebFlower then
+                                DebFlower = false
+                                PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
+                                --[[Remotes.ColleteWaspFlower:FireAllClients({ -- Client 
+                                    Setting = TableWaspSettings.WaspSettings,
+                                    RayStamp = TableWaspSettings.WaspSettings.RayStamp
+                                })]]
+                                task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
+                            end
+                        elseif Distation > 1 then
+                            PartRandome.CFrame *= CFrame.Angles(0,0,0)
+                        end
+                    end
+                end)
+
             end
+
+            task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
+            
+            if not DebFlower then
+                FlowerCollect:ConnectWasp(TableWaspSettings.Player,Flower, {TSS = TableWaspSettings.WaspSettings})
+                Deb = true
+                DebFlower = true
+            end
+
+            TableWaspSettings.WaspData.Energy -= 1
         end
     end
 end
@@ -107,7 +131,7 @@ end
 function WaspModule:Sleep(TableWaspSettings : table) -- Sleep Wasp
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     if TableWaspSettings.WaspData.Energy <= 0  then -- подумать как сделать чтобы оно поварачивалось правильно
-
+        PartRandome.CFrame = CFrame.new(TableWaspSettings.SlotPos.Position)
         PartRandome.CFrame *= CFrame.Angles(0,math.rad(60),0)
         PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(-90))
 
@@ -196,6 +220,7 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
     task.spawn(function()
         for _, player in pairs(game:GetService("Players"):GetPlayers()) do
             local character = player.Character or player.CharacterAdded:Wait()
+            self.SettingTable[NameWasp.Name].Player = player
             self.SettingTable[NameWasp.Name].Character = character
             self.SettingTable[NameWasp.Name].Model.Primary:SetNetworkOwner(player)
             self.SettingTable[NameWasp.Name].LookVector = false
@@ -207,6 +232,7 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
         Remotes.ClientWasp:FireAllClients(TableWaspSettings)
 
         while true do task.wait()
+            print(TableWaspSettings.PlayerData.FakeSettings.Field)
             if TableWaspSettings.Character and TableWaspSettings.Model then
                 if TableWaspSettings.WaspData.Energy <= 0 then -- Function Sleeps
                     self:Sleep(TableWaspSettings)
