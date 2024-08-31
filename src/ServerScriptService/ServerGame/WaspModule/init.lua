@@ -59,8 +59,37 @@ function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : Modul
     return self
 end
 
-function WaspModule:CollectPollen()
-    
+function WaspModule:CollectPollen(TableWaspSettings : table) -- Проблема тут 
+    local Deb : boolean = false
+    local Character : CharacterAppearance = TableWaspSettings.Character
+    local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
+    local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
+
+    local NewPos : Vector3? 
+    local FieldTable : table = workspace.GameSettings.Fields:FindFirstChild(TableWaspSettings.PlayerData.FakeSettings.OldField):GetChildren()
+    local Flower : number = FieldTable[math.random(1, #FieldTable)]
+    if not Deb then
+        Deb = true
+        TableWaspSettings.LookVector = false
+        if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 20 and TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
+            NewPos = Flower.Position + Vector3.new(0,2,0)
+            PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(1))
+            PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
+            PartRandome.Position = NewPos
+            if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
+                if PartRandome.Position == NewPos then
+                    print('a')
+                else
+                    print('f')
+                end
+                PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
+                task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
+                task.wait(0.35)
+                PartRandome.CFrame = CFrame.Angles(0,0,0)
+                Deb = false
+            end
+        end
+    end
 end
 
 function WaspModule:ComeToMe(TableWaspSettings : table)-- вылет с улья и подлет к персонажу
@@ -97,7 +126,6 @@ function WaspModule:AIPosRandom(settings : table) -- рандомная пози
     if settings ~= nil then task.wait()
         if settings.Type == ">" then -- если полный рюкзак 
             if PosBooleChr and PartRandome ~= nil then
-                print('s')
                 PosBooleChr = not PosBooleChr
                 TableWaspSettings.LookVector = false
 
@@ -188,7 +216,7 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
                         else
                             if not TableWaspSettings.PlayerData.FakeSettings.Making then
                                 if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" and TableWaspSettings.PlayerData.IStats.Pollen < TableWaspSettings.PlayerData.IStats.Capacity then
-                                    self:CollectPollen()
+                                    self:CollectPollen(TableWaspSettings)
                                 elseif TableWaspSettings.PlayerData.FakeSettings.Field == "" or TableWaspSettings.PlayerData.IStats.Pollen >= TableWaspSettings.PlayerData.IStats.Capacity then
                                     if TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude > 0 then
                                         self:AIPosRandom({

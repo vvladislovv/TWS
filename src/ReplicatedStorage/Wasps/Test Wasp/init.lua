@@ -19,7 +19,7 @@ return {
     Ability = {"Bomb"},
     AbilitySuper = "",
 	
-	ConvertsTime = 4,
+	ConvertsTime = 2,
 	Converts = 100,
 	
 	StatsModule = {
