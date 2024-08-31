@@ -142,7 +142,9 @@ end
 
 function UserPlayerData:Get(player : Player)
     if game:GetService("RunService"):IsServer() then
-        return UserPlayerData.Profiles[player].Data
+        if UserPlayerData.Profiles[player] ~= nil then
+            return UserPlayerData.Profiles[player].Data
+        end
     else
         return Remotes.PlayerClientData:InvokeServer()
     end

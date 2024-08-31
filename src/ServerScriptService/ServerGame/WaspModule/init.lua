@@ -61,9 +61,11 @@ function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : Modul
     return self
 end
 
-function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать токены
+function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать токены + исправить баг и написать по нормальному
     local Deb : boolean = false
     local DebFlower : boolean = false
+    local DebTokek : boolean 
+    local Timer : number = 0
     local Character : CharacterAppearance = TableWaspSettings.Character
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
@@ -87,8 +89,22 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
                         local Distation : number = (PartRandome.Position - Primary.Position).Magnitude
                         if Distation < 0.5 then
                             if not DebFlower then
-                                DebFlower = false
-                                PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
+                                if TableWaspSettings.WaspSettings.Ability ~= {} and math.random(1,10) <= 10 then -- 100
+
+                                    repeat 
+                                        Timer += 1
+                                        DebTokek = true
+                                        for i = 1, 360, 1 do
+                                            PartRandome.CFrame *= CFrame.Angles(0,math.rad(1),0)
+                                            task.wait()
+                                        end
+                                    until Timer == 2
+                                    --DebTokek = false
+                                end
+                                if not DebTokek then
+                                    DebFlower = false
+                                    PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40)) 
+                                end
                                 --[[Remotes.ColleteWaspFlower:FireAllClients({ -- Client 
                                     Setting = TableWaspSettings.WaspSettings,
                                     RayStamp = TableWaspSettings.WaspSettings.RayStamp
@@ -102,13 +118,15 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
                 end)
 
             end
-
+            
             task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
             
-            if not DebFlower then
+            if not DebFlower and DebTokek == false then
+                print(DebTokek)
                 FlowerCollect:ConnectWasp(TableWaspSettings.Player,Flower, {TSS = TableWaspSettings.WaspSettings})
                 Deb = true
                 DebFlower = true
+                Timer = 0
             end
 
             TableWaspSettings.WaspData.Energy -= 1

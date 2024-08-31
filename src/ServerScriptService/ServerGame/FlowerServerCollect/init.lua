@@ -153,7 +153,9 @@ for _, FieldFolder in next, workspace.GameSettings.FieldZone:GetChildren() do
 
     ZonePlus.playerExited:Connect(function(Player : Player)
         local PData : table = Data:Get(Player)
-        PData.FakeSettings.Field = ""
+        if PData ~= nil then
+            PData.FakeSettings.Field = ""
+        end
     end)
 
 end
