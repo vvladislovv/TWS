@@ -136,6 +136,34 @@ function WaspModule:AttackMobs() -- Аттака моба осой
     print('AttackMobs')
 end
 
+function WaspModule:TokenSpawn(TableWaspSettings : table) --Check
+    if TableWaspSettings.WaspSettings.Ability then
+        if TableWaspSettings.Model then
+            local TokenTable : table = require(ReplicatedStorage.Libary.TokensGame)
+            local TokenType : table = TokenTable[math.random(1, #TableWaspSettings.WaspSettings.Ability)]
+            local Deb : boolean = false
+            if TokenType ~= nil and not Deb then
+                Deb = true
+                
+                local FlowerRay : Ray = Ray.new(TableWaspSettings.Model:FindFirstChild('Primary').Position, Vector3.new(0,-8,0))
+                local RayResult : RaycastResult = WaspModule:FindPartOnRayWithWhitelist(FlowerRay, {workspace.GameSettings.Fields})
+
+                require(script.Parent.TokenModule):CreateToken({
+                    Type = "Any",
+                    Item = TokenType,
+                    Model = nil,
+                    Player = TableWaspSettings.Character,
+                    Pos = RayResult.Position, -- + Vector3.new(0, 2.5, 0)
+                    Amt = 1,
+                    Resource = `from {TableWaspSettings.PlayerData.FakeSettings.OldField} Field`
+                })
+                task.wait(0.3)
+                Deb = false
+            end
+        end
+    end
+end
+
 function WaspModule:AIPos(NameWasp : string) -- переписать движения чтобы была загрузка другая
     task.spawn(function()
         for _, player in pairs(game:GetService("Players"):GetPlayers()) do

@@ -58,6 +58,36 @@ function ProfileData:DataNew()
         Pollen = 0,
         Capacity = 100000000000000000, --350
     }
+    PData.Amulets = {
+        ['Moon'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+        ['Bees'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+        ['Crocodile'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+        ['Gear'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+        ['Star'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+        ['Eye'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+        ['Drum'] = {
+            ['Pollen From Collecter'] = 15,
+           -- ['']
+        },
+    }
 
    PData.BoostGame = {
         FieldBoost = {},

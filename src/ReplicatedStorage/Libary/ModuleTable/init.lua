@@ -4,6 +4,7 @@ local ModuleTable = {} do
         Admins = {
             [1] = 'vlad060108',
             [2] = 'TOPCIERG',
+            [3] = 'Helaliky',
         },
         BanPlayer = {
             [1] = 'dima0tu3',
@@ -17,6 +18,7 @@ local ModuleTable = {} do
         }
     }
 
+    
     ModuleTable.LevelWasp = {
         [1] = 125,
         [2] = 375,
@@ -40,6 +42,19 @@ local ModuleTable = {} do
         [20] = 35000000,]]
     }
 
+    ModuleTable.TagsColors = function(TextTag : string)
+        local TagColors = {
+            ['Snail'] = Color3.fromRGB(202, 255, 179),
+            ['Tester'] = Color3.fromRGB(255, 167, 43),
+            ['Worker'] = Color3.fromRGB(25, 125, 255),
+            ['Developer Game'] = Color3.fromRGB(255, 0, 4),
+        }
+        for index, value in next, TagColors do
+            if index == TextTag then
+                return value
+            end
+        end
+    end
 
     ModuleTable.Rarity = function(Rarity : string)
         local TableRarity = {

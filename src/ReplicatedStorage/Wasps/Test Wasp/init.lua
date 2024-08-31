@@ -16,7 +16,7 @@ return {
 	Energy = 50,
 	CollectTime = 3,
 	
-    Ability = {"Bowm"},
+    Ability = {"Bomb"},
     AbilitySuper = "",
 	
 	ConvertsTime = 4,

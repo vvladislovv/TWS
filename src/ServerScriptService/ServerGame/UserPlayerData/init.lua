@@ -62,6 +62,39 @@ function LoadUserData(player : Player)
     end)
 end
 
+function TagsPlayer(Player)
+    local Tags : BillboardGui = ReplicatedStorage.Assert.Tags:Clone()
+
+        local Head :CharacterMesh = Player.Character:FindFirstChild('Head')
+        local Uppertext : TextLabel = Tags.UpperText -- Rank Gruop
+		local Lowertext : TextLabel = Tags.LowerText -- Name Player
+		local Humanoid : Humanoid = Player.Character.Humanoid
+
+		Humanoid.DisplayDistanceType = "None"
+
+		--Create Text character
+		Tags.Parent = Head
+		Tags.Adornee = Head
+		Lowertext.Text = Player.DisplayName -- Player Name 
+        print('f')
+        if Player:GetRankInGroup(33683629) == 3 then
+            Uppertext.Text = "Tester"
+            Uppertext.TextColor3 = ModuleTable.TagsColors("Tester")
+        elseif Player:GetRankInGroup(33683629) == 1 then
+            Uppertext.Text = "Snail"
+            Uppertext.TextColor3 = ModuleTable.TagsColors("Snail")
+        elseif Player:GetRankInGroup(33683629) == 4 then
+            Uppertext.Text = "Worker"
+            Uppertext.TextColor3 = ModuleTable.TagsColors("Worker")
+        elseif Player:GetRankInGroup(33683629) == 255 then
+            Uppertext.Text = "Developer Game" 
+            Uppertext.TextColor3 = ModuleTable.TagsColors("Developer Game")
+        elseif Player:GetRankInGroup(33683629) == 0 then
+            Uppertext.Visible = false
+        end
+end
+
+
 function CheckPlayer(Player : Player, PData : table)
     for _, GetTable in next, ModuleTable.PlayerGame.Admins do
         if Player:GetRankInGroup(33683629) == 3 or GetTable == Player.Name then
@@ -97,6 +130,8 @@ function CheckPlayer(Player : Player, PData : table)
         end
        -- print(HttpService:JSONDecode(HttpService:JSONEncode(PData))) Error Discord
     end)()]]
+
+    TagsPlayer(Player) 
 end
 
 function ResetDataPlayer(player : Player)
