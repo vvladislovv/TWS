@@ -282,59 +282,6 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
                 end
             end
         end)
-
-
-    --[[task.spawn(function()
-        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-            local character = player.Character or player.CharacterAdded:Wait()
-            self.Character = character
-
-            TweenModule:WaspPosition(PosRandome, character.HumanoidRootPart.Position + Vector3.new(math.random(-6,6), math.random(-0.1,1), math.random(-6,6)))
-            task.wait(1)
-
-            while true do task.wait()
-                if self.WaspData.Energy <= 0 then
-                    self:Sleep()
-                    break
-                elseif self.WaspData.Energy > 0 then 
-                    print(self.WaspData.Energy)
-                    if self.PlayerData.FakeSettings.Attack then
-                        --self:Attack(self.Player)
-                    else
-                        if not self.PlayerData.FakeSettings.Making then
-                            if self.PlayerData.FakeSettings.Field ~= "" and self.PlayerData.IStats.Pollen < self.PlayerData.IStats.Capacity then
-                                --self:CollectPollen()
-                            elseif self.PlayerData.FakeSettings.Field == "" or self.PlayerData.IStats.Pollen >= self.PlayerData.IStats.Capacity then
-                                local NewPos : Vector3?
-
-                                if character.Humanoid.MoveDirection.Magnitude > 0 then
-
-                                    NewPos = character.HumanoidRootPart.Position + self.FlyPos
-                                    self.NewPos = NewPos
-                                    TweenModule:WaspPosition(PosRandome, NewPos)
-                                    TweenModule:WaspOrintation(PosRandome,CFrame.new(Primary.Position, NewPos) * CFrame.Angles(0, math.rad(-90), 0))
-                                    task.wait(2)
-
-                                elseif character.Humanoid.MoveDirection.Magnitude <= 0 then
-                                    NewPos = character.HumanoidRootPart.Position + Vector3.new(math.random(-10,10), math.random(-0.5,1.5), math.random(-19,10))
-                                    self.NewPos = NewPos
-                                    
-                                    TweenModule:WaspPosition(PosRandome, NewPos)
-                                    TweenModule:WaspOrintation(PosRandome,CFrame.new(Primary.Position, NewPos) * CFrame.Angles(0, math.rad(-90), 0))
-                                    task.wait(2.5)
-                                    if (Primary.Position - PosRandome.Position).Magnitude <= 1 and character.Humanoid.Health > 0 then
-                                        TweenModule:WaspOrintation(PosRandome, CFrame.new(Primary.Position, NewPos) * CFrame.Angles(0, math.rad(-90), 0))                                
-                                    end 
-                                end
-                            end
-                        else
-                            -- Self:MakeHoney()
-                        end
-                    end
-                end
-            end
-        end
-    end)]]
     
 end
 
