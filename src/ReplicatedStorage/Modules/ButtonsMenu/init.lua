@@ -21,6 +21,10 @@ function DistationButton(Button : Part, Distation)
                 Button:SetAttribute('OpenButton', true)
             elseif Button.Name == "Shop" then
                 Button:SetAttribute('OpenButton', true)
+            elseif Button.Name == "Clock" then
+                Button:SetAttribute('OpenButton', true)
+            elseif Button.Name == "Converter" then
+                Button:SetAttribute('OpenButton', true)
             end
         elseif Distation > 10  then
             TweenModule.CloseButton(Button.B)
@@ -32,6 +36,10 @@ function DistationButton(Button : Part, Distation)
                 Button:SetAttribute('OpenButton', false)
             elseif Button.Name == "Shop" then
                 Button:SetAttribute('OpenButton', false)
+            elseif Button.Name == "Clock" then
+                Button:SetAttribute('OpenButton', true)
+            elseif Button.Name == "Converter" then
+                Button:SetAttribute('OpenButton', true)
             end
         end
     end)
@@ -54,6 +62,10 @@ function KeyCode(input, GPE)
                         require(script.Parent.ShopModule):StartModule(ScriptButton)
                     elseif ScriptButton.Name == "ResetData" then
                         Remotes.ResetData:FireServer()
+                    elseif ScriptButton.Name == "Converter" then
+                        require(script.Parent.Parent.Libary.EventModule.ConvertModule):Starter(ScriptButton)
+                    elseif ScriptButton.Name == "Clock" then
+                        require(script.Parent.Parent.Libary.EventModule.ClockModule):Starter(ScriptButton)
                     end
                 end
             end
@@ -72,6 +84,10 @@ function KeyCode(input, GPE)
                         require(script.Parent.ShopModule):StartModule(ScriptButton)
                     elseif ScriptButton.Name == "ResetData" then
                         Remotes.ResetData:FireServer()
+                    elseif ScriptButton.Name == "Converter" then
+                        require(script.Parent.Parent.Libary.EventModule.ConvertModule):Starter(ScriptButton)
+                    elseif ScriptButton.Name == "Clock" then
+                        require(script.Parent.Parent.Libary.EventModule.ClockModule):Starter(ScriptButton)
                     end
                 end
             end

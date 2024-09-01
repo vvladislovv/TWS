@@ -26,6 +26,7 @@ function ProfileData:DataNew()
 
     PData.Inventory = {
         ['Sugar'] = 30,
+        ['Ticket'] = 30,
         ['Strawberry'] = 30,
         ['Treat'] = 125,
         ['Oil'] = 15
@@ -55,9 +56,10 @@ function ProfileData:DataNew()
     PData.IStats = {
         Honey = 15000,
         DailyHoney = 0,
-        Pollen = 0,
+        Pollen = 30000,
         Capacity = 100000000000000000, --350
     }
+
     PData.Amulets = {
         ['Moon'] = {
             ['Pollen From Collecter'] = 15,
@@ -103,6 +105,7 @@ function ProfileData:DataNew()
             ["Blue Pollen"] = 100,
 
             ['Movement Collection'] = 100,
+            ['Convert +'] =100,
 
             ["Pollen From Bees"] = 100,
             ["Pollen From Tools"] = 100,
@@ -114,6 +117,7 @@ function ProfileData:DataNew()
         TokenBoost = {},
         CraftBoost = {}
     }
+    PData.Couldown = {}
     
     PData.HiveModule = {
         HiveSlotAll = 1, -- PlayerSlots

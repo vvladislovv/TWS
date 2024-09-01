@@ -101,6 +101,7 @@ function FinishQuest(NPC : string, TypeFunc : string)
         Controls:Enable()
         Camera.CameraType = Enum.CameraType.Custom
         canMoveCamera = true
+        
         if TypeFunc == "Skip" then
             -- + Remote QuestServer
         elseif TypeFunc == "Cancel" then
