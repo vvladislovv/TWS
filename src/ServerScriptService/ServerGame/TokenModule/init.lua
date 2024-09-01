@@ -16,6 +16,9 @@ function TokenModule:CreateToken(InfoToken : table)
         for index, value in InfoToken.Item do
             TokenInfo = TokenInfoTable[index]
         end
+
+    elseif InfoToken.Type == "Wasp" then
+        TokenInfo = TokenInfoTable[InfoToken.Item]
    end
    
    if not workspace.GameSettings.Tokens:FindFirstChild(InfoToken.Player.Name) then
@@ -45,7 +48,6 @@ function TokenModule:CreateToken(InfoToken : table)
             NewToken:FindFirstChild('Inside').CanTouch = false
             NewToken:FindFirstChild('Outside').CanTouch = false
             TweenModule:TouchedToken(NewToken)
-
         end
     end)
 

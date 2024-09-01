@@ -16,6 +16,40 @@ local Utils : ModuleScript = require(ReplicatedStorage.Libary.Utils)
 local WaspModule = {}
 WaspModule.__index = WaspModule
 
+WaspModule.GetDist = function(Character : Player, Flower : BasePart)
+    if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 20 then
+        return true
+    else
+        return false
+    end
+end
+WaspModule.WaitInField = function(PartRandome : BasePart, Primary : BasePart, PData : table)
+    if PartRandome and Primary then
+        repeat task.wait()
+            if PData.FakeSettings.Field =="" then
+                break 
+            end            
+        until  (PartRandome.Position - Primary.Position).Magnitude <= 0.5
+    else
+        return false
+    end
+end
+
+WaspModule.Rotation = function(WaspModel : Model)
+    WaspModel.CFrame *= CFrame.Angles(0,0,-math.rad(40))
+
+    local rotationSpeed = 1 -- угол в градусах на кадр
+    local totalAngle = 360 -- общее количество градусов поворота
+    local elapsedTime = 0
+
+    if WaspModel then
+        while elapsedTime < totalAngle do
+            local deltaTime = RunService.Heartbeat:Wait() -- Ждем до следующего кадра
+            elapsedTime = elapsedTime + rotationSpeed * (deltaTime * 60) -- Увеличиваем угол с учетом времени
+            WaspModel.CFrame *= CFrame.Angles(0, math.rad(rotationSpeed), 0)
+        end
+    end
+end
 
 function WaspModule:LookVectorCharacter(Settings : table)
     local Character = Settings.Character
@@ -63,9 +97,6 @@ end
 
 function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать токены + исправить баг и написать по нормальному
     local Deb : boolean = false
-    local DebFlower : boolean = false
-    local DebTokek : boolean 
-    local Timer : number = 0
     local Character : CharacterAppearance = TableWaspSettings.Character
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
@@ -77,60 +108,22 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
     if not Deb then
         Deb = true
         TableWaspSettings.LookVector = false
-        if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 20 and TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
+        if WaspModule.GetDist(Character, Flower) and TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
             NewPos = Flower.Position + Vector3.new(0,2,0)
             PartRandome.CFrame = CFrame.new(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
             PartRandome.Position = NewPos
-            print(TableWaspSettings.PlayerData.FakeSettings.Field)
+            WaspModule.WaitInField(PartRandome,Primary,TableWaspSettings.PlayerData)
+
             if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
-
-                task.spawn(function()
-                    while true do task.wait()
-                        local Distation : number = (PartRandome.Position - Primary.Position).Magnitude
-                        if Distation < 0.5 then
-                            if not DebFlower then
-                                if TableWaspSettings.WaspSettings.Ability ~= {} and math.random(1,10) <= 10 then -- 100
-
-                                    repeat 
-                                        Timer += 1
-                                        DebTokek = true
-                                        for i = 1, 360, 1 do
-                                            PartRandome.CFrame *= CFrame.Angles(0,math.rad(1),0)
-                                            task.wait()
-                                        end
-                                    until Timer == 2
-                                    --DebTokek = false
-                                end
-                                if not DebTokek then
-                                    DebFlower = false
-                                    PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40)) 
-                                end
-                                --[[Remotes.ColleteWaspFlower:FireAllClients({ -- Client 
-                                    Setting = TableWaspSettings.WaspSettings,
-                                    RayStamp = TableWaspSettings.WaspSettings.RayStamp
-                                })]]
-                                task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
-                            end
-                        elseif Distation > 1 then
-                            PartRandome.CFrame *= CFrame.Angles(0,0,0)
-                        end
-                    end
-                end)
-
-            end
-            
-            task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
-            
-            if not DebFlower and DebTokek == false then
-                print(DebTokek)
+                PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
+                task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
                 FlowerCollect:ConnectWasp(TableWaspSettings.Player,Flower, {TSS = TableWaspSettings.WaspSettings})
-                Deb = true
-                DebFlower = true
-                Timer = 0
+                if TableWaspSettings.WaspSettings.Ability ~= {} and math.random(1,10) <= 10 then -- 100
+                    WaspModule.Rotation(PartRandome)
+                    self:TokenSpawn(TableWaspSettings)
+                end
             end
-
-            TableWaspSettings.WaspData.Energy -= 1
-        end
+       end
     end
 end
 
@@ -209,17 +202,17 @@ end
 function WaspModule:TokenSpawn(TableWaspSettings : table) --Check
     if TableWaspSettings.WaspSettings.Ability then
         if TableWaspSettings.Model then
-            local TokenTable : table = require(ReplicatedStorage.Libary.TokensGame)
+            local TokenTable : table = TableWaspSettings.WaspSettings.Ability
             local TokenType : table = TokenTable[math.random(1, #TableWaspSettings.WaspSettings.Ability)]
             local Deb : boolean = false
+
             if TokenType ~= nil and not Deb then
                 Deb = true
-                
                 local FlowerRay : Ray = Ray.new(TableWaspSettings.Model:FindFirstChild('Primary').Position, Vector3.new(0,-8,0))
-                local RayResult : RaycastResult = WaspModule:FindPartOnRayWithWhitelist(FlowerRay, {workspace.GameSettings.Fields})
+                local RayResult : RaycastResult = workspace:FindPartOnRayWithWhitelist(FlowerRay, {workspace.GameSettings.Fields})
 
                 require(script.Parent.TokenModule):CreateToken({
-                    Type = "Any",
+                    Type = "Wasp",
                     Item = TokenType,
                     Model = nil,
                     Player = TableWaspSettings.Character,
