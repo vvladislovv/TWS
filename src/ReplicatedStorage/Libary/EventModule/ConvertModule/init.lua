@@ -11,9 +11,7 @@ function ConvertModule:Starter(Button : GuiButton)
     local Inventory : table = PData.Inventory
     local IStats : table = PData.IStats
     local ConverNumeber : number = Button:GetAttribute('ConverNum')
-    print(IStats.Pollen)
-    print(IStats.Honey)
-    print(not PData.Couldown[`Convert {ConverNumeber}`])
+
     if Player:IsInGroup(33683629) and not PData.Couldown[`Convert {ConverNumeber}`] then
         if Inventory['Ticket'] >= 1 and not Debounce then
             Debounce = true
@@ -31,7 +29,7 @@ function ConvertModule:Starter(Button : GuiButton)
             print(IStats.Pollen)
             print(IStats.Honey)
         end
-    elseif Player:IsInGroup(33683629) and PData.Couldown[`Convert {ConverNumeber}`] ~= 0 then
+    elseif Player:IsInGroup(33683629) and PData.Couldown[`Convert {ConverNumeber}`] <= time() then
         --noffical
         print('NONONO')
     end

@@ -105,7 +105,8 @@ function ProfileData:DataNew()
             ["Blue Pollen"] = 100,
 
             ['Movement Collection'] = 100,
-            ['Convert +'] =100,
+            ['Convert +'] = 100,
+            --['Clock Boost'] = 100,
 
             ["Pollen From Bees"] = 100,
             ["Pollen From Tools"] = 100,
