@@ -56,8 +56,8 @@ function ProfileData:DataNew()
     PData.IStats = {
         Honey = 15000,
         DailyHoney = 0,
-        Pollen = 30000,
-        Capacity = 100000000000000000, --350
+        Pollen = 10000,
+        Capacity = 350, --350
     }
 
     PData.Amulets = {
@@ -106,8 +106,10 @@ function ProfileData:DataNew()
 
             ['Movement Collection'] = 100,
             ['Convert +'] = 100,
-            --['Clock Boost'] = 100,
-
+            ["Convert Rate"] = 100,
+            --['Clock Boost'] = 100,\
+            ['Convert Amount'] = 100,
+            ["Total Converts"] = 0,
             ["Pollen From Bees"] = 100,
             ["Pollen From Tools"] = 100,
             --// Field Boost 
@@ -133,8 +135,8 @@ function ProfileData:DataNew()
             Attack = 0,
             Slot = slot,
             Speed = 15,
-            Energy = 15,
-            ELimit = 10,
+            Energy = 25,
+            ELimit = 25,
             Bond = 0,
             Level = 1,
         }

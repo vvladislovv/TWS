@@ -4,6 +4,7 @@ local Player : Player = game.Players.LocalPlayer
 local HiveFolder : Folder = workspace.GameSettings.Hives
 local Remotes : Folder = ReplicatedStorage.Remotes
 local StartHive : boolean = false
+local Convert : boolean = false
 
 local HiveModule = {}
 
@@ -11,6 +12,14 @@ function HiveModule:Start(Button : Part)
     local PData : table = DataClient:GetClient()
     if PData.FakeSettings.HiveOwner ~= Player.Name or Button:GetAttribute('HiveOwner') == "" then
         HiveOwnerClient(Button,PData)
+    elseif PData.FakeSettings.HiveOwner == Player.Name and Button:GetAttribute('HiveOwner') == Player.Name then
+        if not PData.FakeSettings.Making then
+            PData.FakeSettings.Making = true
+            DataClient:WriteDataServer({"FakeSettings", "Making", true})
+        elseif PData.FakeSettings.Making then
+            PData.FakeSettings.Making = false
+            DataClient:WriteDataServer({"FakeSettings", "Making", false})
+        end
     end
 end
 

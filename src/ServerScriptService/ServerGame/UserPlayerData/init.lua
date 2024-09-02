@@ -153,7 +153,7 @@ end
 function SetWriteData(Player : Player, DataSettings : string)
     pcall(function()
         UserPlayerData.Profiles[Player].Data[DataSettings[1]][DataSettings[2]] = DataSettings[3]
-       -- UserPlayerData.Profiles[Player].Data[DataSettings][DataS2] = Data1
+       print(UserPlayerData.Profiles[Player].Data[DataSettings[1]][DataSettings[2]])
     end)
 end
 

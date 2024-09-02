@@ -2,10 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes : Folder = ReplicatedStorage.Remotes
 local FolderWasp : Folder = workspace.GameSettings.Wasps
 local WaspModule1 : ModuleScript? = ReplicatedStorage.Wasps
-local PosStart : boolean = true
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService('TweenService')
-
+local StartSystems : boolean = true
 local PosBooleChr : boolean = false
 local PosBooleNow : boolean  = false
 --// Libary
@@ -23,6 +21,7 @@ WaspModule.GetDist = function(Character : Player, Flower : BasePart)
         return false
     end
 end
+
 WaspModule.WaitInField = function(PartRandome : BasePart, Primary : BasePart, PData : table)
     if PartRandome and Primary then
         repeat task.wait()
@@ -36,7 +35,6 @@ WaspModule.WaitInField = function(PartRandome : BasePart, Primary : BasePart, PD
 end
 
 WaspModule.Rotation = function(WaspModel : Model)
-    WaspModel.CFrame *= CFrame.Angles(0,0,-math.rad(40))
 
     local rotationSpeed = 1 -- угол в градусах на кадр
     local totalAngle = 360 -- общее количество градусов поворота
@@ -119,10 +117,12 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
                 task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
                 FlowerCollect:ConnectWasp(TableWaspSettings.Player,Flower, {TSS = TableWaspSettings.WaspSettings})
                 if TableWaspSettings.WaspSettings.Ability ~= {} and math.random(1,10) <= 10 then -- 100
+                    PartRandome.CFrame *= CFrame.Angles(0,0,-math.rad(40)) -- это было в функции  WaspModule.Rotation
                     WaspModule.Rotation(PartRandome)
                     self:TokenSpawn(TableWaspSettings)
                 end
             end
+            TableWaspSettings.WaspData.Energy -= 1
        end
     end
 end
@@ -141,8 +141,10 @@ end
 
 function WaspModule:Sleep(TableWaspSettings : table) -- Sleep Wasp
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
-    if TableWaspSettings.WaspData.Energy <= 0  then -- подумать как сделать чтобы оно поварачивалось правильно
-        PartRandome.CFrame = CFrame.new(TableWaspSettings.SlotPos.Position)
+    local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
+    PartRandome.Position = TableWaspSettings.SlotPos.WorldCFrame.Position
+    PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, Primary.Position) * CFrame.Angles(0,math.rad(90),0)
+    if TableWaspSettings.WaspData.Energy <= 0 and WaspModule.GetDist(TableWaspSettings.Model, PartRandome) then -- подумать как сделать чтобы оно поварачивалось правильно
         PartRandome.CFrame *= CFrame.Angles(0,math.rad(60),0)
         PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(-90))
 
@@ -191,8 +193,35 @@ function WaspModule:AIPosRandom(settings : table) -- рандомная пози
     end
 end
 
-function WaspModule:MakeHoney() -- Cбор меба на поле
-    print('MakeHoney')
+function WaspModule:MakeHoney(TableWaspSettings : table) -- Cбор меба на поле
+    local Conversion : number?
+    local Character : CharacterAppearance = TableWaspSettings.Character
+    local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
+    local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
+
+    if TableWaspSettings.PlayerData.BoostGame.PlayerBoost["Total Converts"] < TableWaspSettings.PlayerData.IStats.Pollen and TableWaspSettings.PlayerData.FakeSettings.Making then
+        Conversion = math.round(
+            (TableWaspSettings.WaspSettings.Converts + TableWaspSettings.PlayerData.BoostGame.PlayerBoost["Convert Amount"]) 
+            + ((TableWaspSettings.WaspSettings.Converts/4) * TableWaspSettings.WaspData.Level) 
+            * (TableWaspSettings.PlayerData.BoostGame.PlayerBoost["Convert Rate"] / 25)
+        )
+    else
+        Conversion = math.round(TableWaspSettings.PlayerData.IStats.Pollen)
+    end
+
+    if Conversion > 0 and TableWaspSettings.PlayerData.IStats.Pollen > 0 then
+        PartRandome.CFrame = Character.HumanoidRootPart.CFrame
+        PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, PartRandome.Position + Character.HumanoidRootPart.CFrame.LookVector)
+        task.wait(1.5)
+        PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, TableWaspSettings.SlotPos.WorldCFrame.Position)
+        PartRandome.Position = TableWaspSettings.SlotPos.WorldCFrame.Position
+        task.wait(1.5)
+        WaspModule.Rotation(PartRandome)
+    end
+end
+
+function WaspModule:AccessoryWasp() -- Cбор меба на поле
+    print('AccessoryWasp')
 end
 
 function WaspModule:AttackMobs() -- Аттака моба осой
@@ -239,20 +268,23 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
         end
         
         local TableWaspSettings : table = self.SettingTable[NameWasp.Name]
-        self:ComeToMe(TableWaspSettings)
-        Remotes.ClientWasp:FireAllClients(TableWaspSettings)
 
         while true do task.wait()
-            print(TableWaspSettings.PlayerData.FakeSettings.Field)
             if TableWaspSettings.Character and TableWaspSettings.Model then
                 if TableWaspSettings.WaspData.Energy <= 0 then -- Function Sleeps
                     self:Sleep(TableWaspSettings)
                 elseif TableWaspSettings.WaspData.Energy > 0 then
+                    if StartSystems then
+                        StartSystems = false
+                        self:ComeToMe(TableWaspSettings)
+                        Remotes.ClientWasp:FireAllClients(TableWaspSettings)
+                    end
                         if TableWaspSettings.PlayerData.FakeSettings.Attack then
                             self:AttackMobs();
                         else
                             if not TableWaspSettings.PlayerData.FakeSettings.Making then
                                 if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" and TableWaspSettings.PlayerData.IStats.Pollen < TableWaspSettings.PlayerData.IStats.Capacity then
+                                
                                     self:CollectPollen(TableWaspSettings)
                                 elseif TableWaspSettings.PlayerData.FakeSettings.Field == "" or TableWaspSettings.PlayerData.IStats.Pollen >= TableWaspSettings.PlayerData.IStats.Capacity then
                                     if TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude > 0 then
@@ -268,7 +300,7 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
                                 end
 
                             else
-                                self:MakeHoney();
+                                self:MakeHoney(TableWaspSettings);
                             end
                         end
                     end
