@@ -193,30 +193,48 @@ function WaspModule:AIPosRandom(settings : table) -- рандомная пози
     end
 end
 
-function WaspModule:MakeHoney(TableWaspSettings : table) -- Cбор меба на поле
+function WaspModule:MakeHoney(TableWaspSettings : table) -- Есть некий баг когда подлитает смотри вниз 
     local Conversion : number?
+    local NewPos : Vector3? = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-8,8), math.random(-0.5,2), math.random(-8,8))
     local Character : CharacterAppearance = TableWaspSettings.Character
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
+    local PData : table = TableWaspSettings.PlayerData
 
-    if TableWaspSettings.PlayerData.BoostGame.PlayerBoost["Total Converts"] < TableWaspSettings.PlayerData.IStats.Pollen and TableWaspSettings.PlayerData.FakeSettings.Making then
+    if PData.BoostGame.PlayerBoost["Total Converts"] < PData.IStats.Pollen and PData.FakeSettings.Making then
         Conversion = math.round(
-            (TableWaspSettings.WaspSettings.Converts + TableWaspSettings.PlayerData.BoostGame.PlayerBoost["Convert Amount"]) 
+            (TableWaspSettings.WaspSettings.Converts + PData.BoostGame.PlayerBoost["Convert Amount"]) 
             + ((TableWaspSettings.WaspSettings.Converts/4) * TableWaspSettings.WaspData.Level) 
-            * (TableWaspSettings.PlayerData.BoostGame.PlayerBoost["Convert Rate"] / 25)
+            * (PData.BoostGame.PlayerBoost["Convert Rate"] / 25)
         )
     else
         Conversion = math.round(TableWaspSettings.PlayerData.IStats.Pollen)
+
     end
 
-    if Conversion > 0 and TableWaspSettings.PlayerData.IStats.Pollen > 0 then
-        PartRandome.CFrame = Character.HumanoidRootPart.CFrame
-        PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, PartRandome.Position + Character.HumanoidRootPart.CFrame.LookVector)
+    if Conversion > 0 and PData.IStats.Pollen > 0 then
+        TableWaspSettings.LookVector = false
+        PartRandome.CFrame = Character.HumanoidRootPart.CFrame 
+        PartRandome.CFrame = CFrame.new(PartRandome.Position,Character.HumanoidRootPart.CFrame.LookVector) * CFrame.Angles(0,-math.rad(90), 0)
         task.wait(1.5)
-        PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, TableWaspSettings.SlotPos.WorldCFrame.Position)
+        PartRandome.CFrame = CFrame.new(PartRandome.Position, TableWaspSettings.SlotPos.WorldCFrame.Position) * CFrame.Angles(0,-math.rad(90), 0)
         PartRandome.Position = TableWaspSettings.SlotPos.WorldCFrame.Position
         task.wait(1.5)
         WaspModule.Rotation(PartRandome)
+        
+        if Conversion >= PData.IStats.Pollen and PData.FakeSettings.Making and PData.IStats.Pollen <= 0 then
+            PData.IStats.Pollen -= Conversion
+            PData.IStats.Honey += math.round(Conversion)
+            PData.IStats.DailyHoney += math.round(Conversion)
+            -- Bagers
+            print('s')
+            Remotes.VisualNumberEvent:FireClient(TableWaspSettings.Player,{Pos = Character, Amt = Conversion, Color = "Coin", Crit = false})
+            print(PData.IStats.Pollen)
+        elseif Conversion <= PData.IStats.Pollen and PData.IStats.Pollen >= 0 and PData.FakeSettings.Making then
+            PData.FakeSettings.Makin = false
+            PartRandome.CFrame = CFrame.new(PartRandome.Position,NewPos) * CFrame.Angles(0,-math.rad(90), 0)
+            PData.IStats.Pollen = 0
+        end
     end
 end
 

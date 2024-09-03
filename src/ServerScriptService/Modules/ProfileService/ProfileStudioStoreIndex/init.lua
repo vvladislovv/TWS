@@ -56,8 +56,8 @@ function ProfileData:DataNew()
     PData.IStats = {
         Honey = 15000,
         DailyHoney = 0,
-        Pollen = 10000,
-        Capacity = 350, --350
+        Pollen = 1000,
+        Capacity = 1000000, --350
     }
 
     PData.Amulets = {
@@ -91,7 +91,7 @@ function ProfileData:DataNew()
         },
     }
 
-   PData.BoostGame = {
+    PData.BoostGame = {
         FieldBoost = {},
         PlayerBoost = {
             ["Instant"] = 0,
@@ -138,7 +138,7 @@ function ProfileData:DataNew()
             Energy = 25,
             ELimit = 25,
             Bond = 0,
-            Level = 1,
+            Level = 100,
         }
     end
 

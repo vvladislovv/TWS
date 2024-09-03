@@ -5,7 +5,7 @@ local Remotes : Folder = ReplicatedStorage.Remotes
 local TextPart : BasePart = ReplicatedStorage.Assert.VisualNumberPart -- set folder RS
 local Player : Player = game.Players.LocalPlayer
 local Utils : ModuleScript = require(ReplicatedStorage.Libary.Utils)
-local HoneyPos : number, DamagePos : number
+local HoneyPos : number, DamagePos : number = 0, 0
 local DataClient = require(ReplicatedStorage.Libary.ClientData)
 local VisualNumber = {}
 
@@ -46,12 +46,26 @@ function GetSize(Amount: number, Crit : boolean)
         local SizeValue : number = 0
 
         if Amount <= 100 then
-            SizeValue = 2
-        elseif Amount > 1000 then
-            SizeValue = 4
-        elseif Amount > 10000 then
-            SizeValue = 5
-        end
+			SizeValue = 2
+		elseif Amount > 100 and Amount <= 1000 then
+			SizeValue = 2.5
+		elseif Amount > 1000 and Amount <= 5000 then
+			SizeValue = 3.5
+		elseif Amount > 5000 and Amount <= 10000 then
+			SizeValue = 3.5
+		elseif Amount > 10000 and Amount <= 25000 then
+			SizeValue = 3.5
+		elseif Amount > 25000 and Amount <= 50000 then
+			SizeValue = 3.5
+		elseif Amount > 50000 and Amount <= 100000 then
+			SizeValue = 3.5
+		elseif Amount > 100000 and Amount <= 1000000 then
+			SizeValue = 3.5
+		elseif Amount > 1000000 and Amount <= 5000000 then
+			SizeValue = 3.5
+		elseif Amount > 5000000 then
+			SizeValue = 3.5
+		end
         if Crit and Crit == true then -- DataClient:Get() (PData)
             SizeValue = 1.5 -- (_G.PData.Boost.PlayerBoost["Critical Power"])
         end
@@ -101,7 +115,8 @@ function VisualEvent(Tab)
 	VP.BillboardGui.Size = GetSize(Tab.Amt, Tab.Crit)()
 	VP.Name = Tab.Amt
 
-	if Tab.Color ~= "Honey" and Tab.Color ~= "Damage" then
+	if Tab.Color ~= "Coin" and Tab.Color ~= "Damage" then
+
 		if Tab.Pos then
 			if typeof(Tab.Pos) == "Vector3" then
 				VP.Position = Tab.Pos
@@ -111,6 +126,7 @@ function VisualEvent(Tab)
 		else
 			VP.Position = Character.PrimaryPart.Position
 		end
+
 		VP.Position += Vector3.new(0,2,0)
 		ray(VP)
 		local rand = math.random(1, Tab.Amt)
@@ -120,15 +136,14 @@ function VisualEvent(Tab)
 		VP.BillboardGui.TextPlayer.Text = "+"..Utils:CommaNumber(Tab.Amt)
 		VP.BillboardGui.TextPlayer.TextColor3 = VisualNumber.TableCollers[Tab.Color]
 		GetLocation(VP)
-	elseif Tab.Color == "Honey" then
+	elseif Tab.Color == "Coin" then
 		VP.Parent = workspace.GameSettings.TextPollen
-		VP.Position = Character.PrimaryPart.Position + Vector3.new(0,5+HoneyPos,0)
-		VP.BillboardGui.TextPlayer.Text = "+"..Utils:CommaNumber(Tab.Amount)
+		VP.Position = Character.PrimaryPart.Position + Vector3.new(0,4+HoneyPos,0)
+		print(VP.BillboardGui.Size)
+		VP.BillboardGui.TextPlayer.Text = "+"..Utils:CommaNumber(Tab.Amt)
 		VP.BillboardGui.TextPlayer.TextColor3 = VisualNumber.TableCollers.Coin
 		HoneyPos += VP.BillboardGui.Size.Height.Scale
-		if HoneyPos > 3 then
-			HoneyPos = 0
-		end
+		
 	end
 
 	task.wait(0.5)
