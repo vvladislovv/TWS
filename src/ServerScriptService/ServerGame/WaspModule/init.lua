@@ -223,7 +223,7 @@ function WaspModule:MakeHoney(TableWaspSettings : table) -- Есть некий 
         WaspModule.Rotation(PartRandome)
         
         if Conversion >= PData.IStats.Pollen and PData.FakeSettings.Making and PData.IStats.Pollen <= 0 then
-            PData.IStats.Pollen -= Conversion
+            PData.IStats.Pollen -= Conversion -- тут проблема
             PData.IStats.Honey += math.round(Conversion)
             PData.IStats.DailyHoney += math.round(Conversion)
             -- Bagers
