@@ -13,14 +13,14 @@ function HiveModule:Start(Button : Part)
     if PData.FakeSettings.HiveOwner ~= Player.Name or Button:GetAttribute('HiveOwner') == "" then
         HiveOwnerClient(Button,PData)
     elseif PData.FakeSettings.HiveOwner == Player.Name and Button:GetAttribute('HiveOwner') == Player.Name then
-        if not PData.FakeSettings.Making then
+        if not PData.FakeSettings.Making and PData.IStats.Pollen >= 0 then
             PData.FakeSettings.Making = true
             DataClient:WriteDataServer({"FakeSettings", "Making", true})
-        elseif PData.FakeSettings.Making then
+        elseif PData.FakeSettings.Making and PData.IStats.Pollen <= 0 then
             PData.FakeSettings.Making = false
             DataClient:WriteDataServer({"FakeSettings", "Making", false})
-        end
-    end
+        end 
+    end    
 end
 
 function HiveOwnerClient(Button: Part, PData : table)

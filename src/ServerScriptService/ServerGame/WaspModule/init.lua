@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService")
 local StartSystems : boolean = true
 local PosBooleChr : boolean = false
 local PosBooleNow : boolean  = false
+local DebWhile : boolean? = false
 --// Libary
 local FlowerCollect : ModuleScript = require(script.Parent.FlowerServerCollect)
 local TweenModule : ModuleScript = require(ReplicatedStorage.Libary.TweenModule)
@@ -15,10 +16,23 @@ local WaspModule = {}
 WaspModule.__index = WaspModule
 
 WaspModule.GetDist = function(Character : Player, Flower : BasePart)
-    if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 20 then
-        return true
-    else
-        return false
+    if Character ~= nil and Flower ~= nil then
+        if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 20 then
+            return true
+        else
+            return false
+        end        
+    end
+end
+
+WaspModule.GetDisHumanoid = function(Character : Player, Flower : BasePart)
+    if Character ~= nil and Flower ~= nil then
+        print((Character.PrimaryPart.Position -  Flower.Position).Magnitude)
+        if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 10 then
+            return true
+        else
+            return false
+        end        
     end
 end
 
@@ -28,20 +42,32 @@ WaspModule.WaitInField = function(PartRandome : BasePart, Primary : BasePart, PD
             if PData.FakeSettings.Field =="" then
                 break 
             end            
-        until  (PartRandome.Position - Primary.Position).Magnitude <= 0.5
+        until (PartRandome.Position - Primary.Position).Magnitude <= 0.5
     else
         return false
     end
 end
 
-WaspModule.Rotation = function(WaspModel : Model)
+WaspModule.WaitInHive = function(PartRandome : Model?, Primary: Model?, PData : table)
+    if PartRandome and Primary then
+        repeat task.wait()
+            if PData.FakeSettings.Making == false then
+                break 
+            end
+        until (PartRandome.Position - Primary.Position).Magnitude <= 5
+    else
+        return false
+    end
+end
+
+WaspModule.Rotation = function(WaspModel : Model, PData : table)
 
     local rotationSpeed = 1 -- угол в градусах на кадр
     local totalAngle = 360 -- общее количество градусов поворота
     local elapsedTime = 0
 
     if WaspModel then
-        while elapsedTime < totalAngle do
+        while elapsedTime < totalAngle and PData.FakeSettings.Making do
             local deltaTime = RunService.Heartbeat:Wait() -- Ждем до следующего кадра
             elapsedTime = elapsedTime + rotationSpeed * (deltaTime * 60) -- Увеличиваем угол с учетом времени
             WaspModel.CFrame *= CFrame.Angles(0, math.rad(rotationSpeed), 0)
@@ -95,6 +121,7 @@ end
 
 function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать токены + исправить баг и написать по нормальному
     local Deb : boolean = false
+    local FieldWasp : boolean = true
     local Character : CharacterAppearance = TableWaspSettings.Character
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
@@ -102,6 +129,7 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
     local NewPos : Vector3?
     local FieldTable : table = workspace.GameSettings.Fields:FindFirstChild(TableWaspSettings.PlayerData.FakeSettings.OldField):GetChildren()
     local Flower : number = FieldTable[math.random(1, #FieldTable)]
+
 
     if not Deb then
         Deb = true
@@ -111,15 +139,29 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
             PartRandome.CFrame = CFrame.new(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
             PartRandome.Position = NewPos
             WaspModule.WaitInField(PartRandome,Primary,TableWaspSettings.PlayerData)
-
             if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
-                PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
-                task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
+
+                while FieldWasp do task.wait()
+                    print(TableWaspSettings.PlayerData.FakeSettings.Field)
+                    if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
+                        PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
+                        task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
+                        break
+                    else
+                        PartRandome.CFrame *= CFrame.Angles(0,0,-math.rad(40))
+                        task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
+                        break
+                    end
+                end
+
+                FieldWasp = false
                 FlowerCollect:ConnectWasp(TableWaspSettings.Player,Flower, {TSS = TableWaspSettings.WaspSettings})
-                if TableWaspSettings.WaspSettings.Ability ~= {} and math.random(1,10) <= 10 then -- 100
+                if TableWaspSettings.WaspSettings.Ability ~= {} and math.random(1,10) <= 10 and TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then -- 100
                     PartRandome.CFrame *= CFrame.Angles(0,0,-math.rad(40)) -- это было в функции  WaspModule.Rotation
-                    WaspModule.Rotation(PartRandome)
-                    self:TokenSpawn(TableWaspSettings)
+                    WaspModule.Rotation(PartRandome, TableWaspSettings.PlayerData)
+                    if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
+                        self:TokenSpawn(TableWaspSettings)
+                    end
                 end
             end
             TableWaspSettings.WaspData.Energy -= 1
@@ -193,9 +235,9 @@ function WaspModule:AIPosRandom(settings : table) -- рандомная пози
     end
 end
 
-function WaspModule:MakeHoney(TableWaspSettings : table) -- Есть некий баг когда подлитает смотри вниз 
+function WaspModule:MakeHoney(TableWaspSettings : table) -- БАГ в том что иногда багаеться 
     local Conversion : number?
-    local NewPos : Vector3? = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-8,8), math.random(-0.5,2), math.random(-8,8))
+    local NewPos : Vector3? = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-8,8), 0, math.random(-8,8))
     local Character : CharacterAppearance = TableWaspSettings.Character
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local Primary : BasePart = TableWaspSettings.Model:FindFirstChild('Primary')
@@ -209,33 +251,59 @@ function WaspModule:MakeHoney(TableWaspSettings : table) -- Есть некий 
         )
     else
         Conversion = math.round(TableWaspSettings.PlayerData.IStats.Pollen)
-
     end
 
-    if Conversion > 0 and PData.IStats.Pollen > 0 then
+    task.spawn(function()
+        while true do task.wait(0.5)
+            for _, value in next, workspace.GameSettings.Button:GetChildren() do
+                if value.Name == "Hive" then
+                    if value:GetAttribute('HiveOwner') == TableWaspSettings.Player.Name then
+                        if (TableWaspSettings.Character.PrimaryPart.Position -  value.Position).Magnitude <= 10 then
+                            DebWhile = true;
+                        else
+                            --print(TableWaspSettings.PlayerData.FakeSettings.Making)
+                            TableWaspSettings.PlayerData.FakeSettings.Making = false;
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    if Conversion > 0 and PData.IStats.Pollen > 0 and PData.FakeSettings.Making and DebWhile then
+        DebWhile = TableWaspSettings.PlayerData.FakeSettings.Making;
         TableWaspSettings.LookVector = false
+
         PartRandome.CFrame = Character.HumanoidRootPart.CFrame 
-        PartRandome.CFrame = CFrame.new(PartRandome.Position,Character.HumanoidRootPart.CFrame.LookVector) * CFrame.Angles(0,-math.rad(90), 0)
+        PartRandome.CFrame = CFrame.new(PartRandome.Position,Character.HumanoidRootPart.CFrame.LookVector)
+        WaspModule.WaitInHive(PartRandome,Character.HumanoidRootPart,TableWaspSettings.PlayerData)
         task.wait(1.5)
+       -- WaspModule.WaitInField(PartRandome,Primary,TableWaspSettings.PlayerData)
         PartRandome.CFrame = CFrame.new(PartRandome.Position, TableWaspSettings.SlotPos.WorldCFrame.Position) * CFrame.Angles(0,-math.rad(90), 0)
         PartRandome.Position = TableWaspSettings.SlotPos.WorldCFrame.Position
+        WaspModule.WaitInHive(PartRandome,TableWaspSettings.SlotPos.WorldCFrame,TableWaspSettings.PlayerData)
         task.wait(1.5)
-        WaspModule.Rotation(PartRandome)
+        WaspModule.Rotation(PartRandome, PData)
         
-        if Conversion >= PData.IStats.Pollen and PData.FakeSettings.Making and PData.IStats.Pollen <= 0 then
+        if PData.FakeSettings.Making and PData.IStats.Pollen >= 0 then
             PData.IStats.Pollen -= Conversion -- тут проблема
-            PData.IStats.Honey += math.round(Conversion)
-            PData.IStats.DailyHoney += math.round(Conversion)
-            -- Bagers
-            print('s')
+            PData.IStats.Honey += Conversion
+            PData.IStats.DailyHoney += Conversion
+
             Remotes.VisualNumberEvent:FireClient(TableWaspSettings.Player,{Pos = Character, Amt = Conversion, Color = "Coin", Crit = false})
-            print(PData.IStats.Pollen)
-        elseif Conversion <= PData.IStats.Pollen and PData.IStats.Pollen >= 0 and PData.FakeSettings.Making then
-            PData.FakeSettings.Makin = false
-            PartRandome.CFrame = CFrame.new(PartRandome.Position,NewPos) * CFrame.Angles(0,-math.rad(90), 0)
-            PData.IStats.Pollen = 0
-        end
+        elseif not PData.FakeSettings.Making then
+            PData.FakeSettings.Making = false
+            PartRandome.Position = NewPos
+            TableWaspSettings.LookVector = true
+        end 
+
+    elseif Conversion < 0 and PData.IStats.Pollen <= 0 or not PData.FakeSettings.Making then
+        PData.FakeSettings.Making = false
+        PartRandome.Position = NewPos
+        TableWaspSettings.LookVector = true
+        PData.IStats.Pollen = 0
     end
+    
 end
 
 function WaspModule:AccessoryWasp() -- Cбор меба на поле
@@ -248,7 +316,7 @@ end
 
 function WaspModule:TokenSpawn(TableWaspSettings : table) --Check
     if TableWaspSettings.WaspSettings.Ability then
-        if TableWaspSettings.Model then
+        if TableWaspSettings.Model and TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
             local TokenTable : table = TableWaspSettings.WaspSettings.Ability
             local TokenType : table = TokenTable[math.random(1, #TableWaspSettings.WaspSettings.Ability)]
             local Deb : boolean = false
@@ -274,7 +342,7 @@ function WaspModule:TokenSpawn(TableWaspSettings : table) --Check
     end
 end
 
-function WaspModule:AIPos(NameWasp : string) -- переписать движения чтобы была загрузка другая
+function WaspModule:AIPos(NameWasp : string) 
     task.spawn(function()
         for _, player in pairs(game:GetService("Players"):GetPlayers()) do
             local character = player.Character or player.CharacterAdded:Wait()
@@ -302,7 +370,6 @@ function WaspModule:AIPos(NameWasp : string) -- переписать движе�
                         else
                             if not TableWaspSettings.PlayerData.FakeSettings.Making then
                                 if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" and TableWaspSettings.PlayerData.IStats.Pollen < TableWaspSettings.PlayerData.IStats.Capacity then
-                                
                                     self:CollectPollen(TableWaspSettings)
                                 elseif TableWaspSettings.PlayerData.FakeSettings.Field == "" or TableWaspSettings.PlayerData.IStats.Pollen >= TableWaspSettings.PlayerData.IStats.Capacity then
                                     if TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude > 0 then
