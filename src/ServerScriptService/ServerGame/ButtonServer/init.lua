@@ -32,7 +32,6 @@ local function handlePlayer(player)
                 humanoid.Died:Connect(function()
                     for _, button in next, game.Workspace.GameSettings.Button:GetChildren() do
                         local Character = player.CharacterAdded:Wait()
-                        print(Character)
                         if Character then
                             local distance = Distation(button, humRootPart)()
                             ReplicatedStorage.Remotes:WaitForChild('ButtonClient'):FireClient(player, button, distance) 
@@ -53,6 +52,22 @@ local function handlePlayer(player)
 end
 
 function Start()
+    task.spawn(function()
+        task.wait(0.35) -- Задержка перед началом
+
+        local success, err = pcall(function()
+            for _, player in ipairs(Players:GetPlayers()) do
+                handlePlayer(player) -- Обработка игрока
+            end
+        end)
+
+        if not success then
+            warn(err) -- Сообщаем об ошибке
+        end
+    end)
+end
+
+function ServerButton:Start()
     task.spawn(function()
         task.wait(0.35) -- Задержка перед началом
 

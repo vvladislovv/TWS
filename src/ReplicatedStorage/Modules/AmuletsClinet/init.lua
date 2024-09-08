@@ -21,15 +21,20 @@ function AnimAmuletCircle(PlayerFolder : Folder)
                 local z = math.sin(Angle) * Radius
     
                 -- Calculate the new CFrame for the amulet
-                task.spawn(function() 
+                task.spawn(function()
                     local AmuletCFrame = CFrame.Angles(0, 0, 0) 
                     * CFrame.new(x, math.sin(tick()*2) / 1, z) 
                     + Character.HumanoidRootPart.Position
-                    
+
                     -- Smoothly interpolate the position
                     GetAmulet:PivotTo(AmuletCFrame)
                 end)
             end
+        end)
+
+        Character.Humanoid.Died:Connect(function()
+            task.wait(5)
+            -- дописать  тут нужно сделать так чтобы при смети аумулеты не повторно спавнились еще раз 
         end)
     end)
 end

@@ -14,10 +14,10 @@ local WaspModule : ModuleScript = require(script.Parent.WaspModule)
 function HiveOwner(Player: Player, Hive : Part, Button : Part)
     local PData : table = Data:Get(Player)
 
-    if PData.FakeSettings.HiveOwner == "" and Hive:GetAttribute('Owner') == "" then
+    if PData.FakeSettings.HiveOwner == "" and Button:GetAttribute('HiveOwner') == "" and Hive:GetAttribute('Owner') == "" then 
         
         PData.FakeSettings.HiveOwner = Player.Name
-        Hive:SetAttribute('Owner', Player.Name)
+        --Hive:SetAttribute('Owner', Player.Name)
         Button:SetAttribute('HiveOwner', Player.Name)
         Button.B.Enabled = false
         PData.FakeSettings.HiveNumberOwner = Hive.Name
@@ -54,6 +54,22 @@ function CheckSlotWasp(CheckSlot : number, Hive : Folder, PData : table)
     end
 end
 
+function HiveServerModule:DiedPlayer(Player, PData : table)
+    local PData : table = Data:Get(Player)
+    if PData.FakeSettings.HiveOwner == Player.Name then
+        for iname, vGet in next, workspace.GameSettings.Button:GetChildren() do
+            if vGet.Name == "Hive" then
+                if vGet:GetAttribute('HiveOwner') == Player.Name then
+                    for index, value in next, workspace.GameSettings.Hives:GetChildren() do
+                        if value:GetAttribute('Owner') == Player.Name then
+                            HiveSpawn(value,PData)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
 
 function HiveServerModule:SpawnWaspSlot(WaspName : string, Hive : Folder, CheckSlot : number, PData : table)
     local WaspModel : Script = ReplicatedStorage.Wasps[WaspName]:Clone()

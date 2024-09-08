@@ -25,14 +25,16 @@ WaspModule.GetDist = function(Character : Player, Flower : BasePart)
     end
 end
 
-WaspModule.GetDisHumanoid = function(Character : Player, Flower : BasePart)
-    if Character ~= nil and Flower ~= nil then
-        print((Character.PrimaryPart.Position -  Flower.Position).Magnitude)
-        if (Character.PrimaryPart.Position -  Flower.Position).Magnitude <= 10 then
-            return true
-        else
-            return false
-        end        
+WaspModule.GetDisHumanoid = function(Character : Player,Part : BasePart, PData : table)
+    if Character and Part then
+        repeat task.wait()
+            if PData.FakeSettings.Making == false then
+                break 
+            end
+            print((Character.PrimaryPart.Position -  Part.Position).Magnitude)
+        until (Character.PrimaryPart.Position -  Part.Position).Magnitude <= 10 
+    else
+        return false
     end
 end
 
@@ -54,7 +56,7 @@ WaspModule.WaitInHive = function(PartRandome : Model?, Primary: Model?, PData : 
             if PData.FakeSettings.Making == false then
                 break 
             end
-        until (PartRandome.Position - Primary.Position).Magnitude <= 5
+        until (Primary.Position - PartRandome.Position).Magnitude <= 5
     else
         return false
     end
@@ -272,16 +274,17 @@ function WaspModule:MakeHoney(TableWaspSettings : table) -- БАГ в том ч�
 
     if Conversion > 0 and PData.IStats.Pollen > 0 and PData.FakeSettings.Making and DebWhile then
         DebWhile = TableWaspSettings.PlayerData.FakeSettings.Making;
-        TableWaspSettings.LookVector = false
+    
 
         PartRandome.CFrame = Character.HumanoidRootPart.CFrame 
-        PartRandome.CFrame = CFrame.new(PartRandome.Position,Character.HumanoidRootPart.CFrame.LookVector)
-        WaspModule.WaitInHive(PartRandome,Character.HumanoidRootPart,TableWaspSettings.PlayerData)
+        PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, Primary.Position) * CFrame.Angles(0,math.rad(90),0)
+        WaspModule.GetDisHumanoid(TableWaspSettings.Model, PartRandome, TableWaspSettings.PlayerData)
+        TableWaspSettings.LookVector = false
         task.wait(1.5)
-       -- WaspModule.WaitInField(PartRandome,Primary,TableWaspSettings.PlayerData)
+   -- WaspModule.WaitInField(PartRandome,Primary,TableWaspSettings.PlayerData)
         PartRandome.CFrame = CFrame.new(PartRandome.Position, TableWaspSettings.SlotPos.WorldCFrame.Position) * CFrame.Angles(0,-math.rad(90), 0)
         PartRandome.Position = TableWaspSettings.SlotPos.WorldCFrame.Position
-        WaspModule.WaitInHive(PartRandome,TableWaspSettings.SlotPos.WorldCFrame,TableWaspSettings.PlayerData)
+        WaspModule.WaitInHive(PartRandome, TableWaspSettings.SlotPos.WorldCFrame, TableWaspSettings.PlayerData)
         task.wait(1.5)
         WaspModule.Rotation(PartRandome, PData)
         

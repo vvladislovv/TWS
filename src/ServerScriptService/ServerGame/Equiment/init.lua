@@ -2,7 +2,9 @@ local Players : Player = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PhysicsService = game:GetService("PhysicsService")
+local HiveModule : ModuleScript = require(script.Parent.HiveServerModule)
 local ServerButton = require(script.Parent.ButtonServer)
+local AmuletsModule = require(script.Parent.AmuletsModule)
 local Data : table = require(ServerScriptService.ServerGame.UserPlayerData)
 local Remotes : Folder = ReplicatedStorage.Remotes
 local ItemsFolder : Folder = ReplicatedStorage.Assert.ItemsGame
@@ -69,6 +71,8 @@ function Equipment:Load(Player : Player, Character : Instance)
         local Character = Player.CharacterAdded:Wait()
         Equipment:Load(Player, Character)
         ServerButton:Start()
+        AmuletsModule:Starts(Player)
+        HiveModule:DiedPlayer(Player, PData)
     end)
 end
 
