@@ -67,8 +67,8 @@ function ProfileData:DataNew()
         },
         ['Bees'] = {
             ['Pollen From Collecter'] = 15,
-           -- ['']
-        },
+           -- [''] 
+        }, 
         ['Crocodile'] = {
             ['Pollen From Collecter'] = 15,
            -- ['']

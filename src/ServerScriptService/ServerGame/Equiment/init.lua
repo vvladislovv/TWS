@@ -71,8 +71,8 @@ function Equipment:Load(Player : Player, Character : Instance)
         local Character = Player.CharacterAdded:Wait()
         Equipment:Load(Player, Character)
         ServerButton:Start()
-        AmuletsModule:Starts(Player)
-        HiveModule:DiedPlayer(Player, PData)
+        --AmuletsModule:Starts(Player)
+        --HiveModule:DiedPlayer(Player, PData)
     end)
 end
 
