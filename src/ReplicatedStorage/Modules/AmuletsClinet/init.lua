@@ -5,48 +5,67 @@ local AmuletClient = {}
 
 local Circle : number = math.pi * 2
 local MinimCircle : number = 1
-local DiedHumanoid : boolean = false
-local PosHumanoid : Vector3 = nil
+local db : Vector3? = false
+local hrp : Humanoid?
+
+function AnimationAmulets(PlayerFolder : Folder)
+	if PlayerFolder ~= nil and #PlayerFolder:GetChildren() then
+		local numAmulets = #PlayerFolder:GetChildren()
+		local Radius = MinimCircle + numAmulets
+
+		for i, GetAmulet in ipairs(PlayerFolder:GetChildren()) do
+			local Angle = i * (Circle / numAmulets) + tick() -- Adding tick() for rotation over time
+			local x = math.cos(Angle) * Radius
+			local z = math.sin(Angle) * Radius
+
+			-- Calculate the new CFrame for the amulet
+			if PlayerFolder ~= nil and numAmulets ~= nil then
+				local AmuletCFrame = CFrame.Angles(0, 0, 0) 
+				* CFrame.new(x, math.sin(tick()*2) / 1, z) 
+				+ game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+
+				-- Smoothly interpolate the position
+				GetAmulet:PivotTo(AmuletCFrame)
+			end
+		end
+	end
+end
 
 function AnimAmuletCircle(PlayerFolder : Folder)
-    local RunService = game:GetService("RunService")
-    local Character = Player.Character or Player.CharacterAdded:Wait()
-	
-    task.spawn(function()
-        RunService.RenderStepped:Connect(function() task.wait()
-            local numAmulets = #PlayerFolder:GetChildren()
-            local Radius = MinimCircle + numAmulets
-				print(Character.HumanoidRootPart.Position)
-				if not DiedHumanoid then
-					if PosHumanoid ~= nil then
-						for i, GetAmulet in ipairs(PlayerFolder:GetChildren()) do
-							local Angle = i * (Circle / numAmulets) + tick() -- Adding tick() for rotation over time
-							local x = math.cos(Angle) * Radius
-							local z = math.sin(Angle) * Radius
-			
-							-- Calculate the new CFrame for the amulet
-							task.spawn(function()
-								 local AmuletCFrame = CFrame.Angles(0, 0, 0) 
-								 * CFrame.new(x, math.sin(tick()*2) / 1, z) 
-								 + Character.HumanoidRootPart.Position
-	  
-								 -- Smoothly interpolate the position
-								 GetAmulet:PivotTo(AmuletCFrame)
-							end)
-					  end
-					end
-				end
-        end)
+	local RunService = game:GetService("RunService")
 
-        Character.Humanoid.Died:Connect(function()
-				DiedHumanoid = true
-            task.wait(5)
-				DiedHumanoid = false
-				--print('sa')
-            -- дописать  тут нужно сделать так чтобы при смети аумулеты не повторно спавнились еще раз 
-        end)
-    end)
+	game.Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
+		if PlayerFolder ~= nil and #PlayerFolder:GetChildren() then
+			local numAmulets = #PlayerFolder:GetChildren()
+			local Radius = MinimCircle + numAmulets
+
+			for i, GetAmulet in ipairs(PlayerFolder:GetChildren()) do
+				local Angle = i * (Circle / numAmulets) + tick() -- Adding tick() for rotation over time
+				local x = math.cos(Angle) * Radius
+				local z = math.sin(Angle) * Radius
+
+				-- Calculate the new CFrame for the amulet
+				if PlayerFolder ~= nil and numAmulets ~= nil then
+					local AmuletCFrame = CFrame.Angles(0, 0, 0) 
+					* CFrame.new(x, math.sin(tick()*2) / 1, z) 
+					+ game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+
+					-- Smoothly interpolate the position
+					GetAmulet:PivotTo(AmuletCFrame)
+				end
+			end
+		end
+	end)
+
+	task.spawn(function()
+		RunService.RenderStepped:Connect(function() task.wait()
+				AnimationAmulets(PlayerFolder)
+		end)
+	end)
+
 end
+
+
 Remotes.AmuletAnim.OnClientEvent:Connect(AnimAmuletCircle)
 
 return AmuletClient

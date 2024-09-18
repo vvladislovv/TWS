@@ -53,7 +53,7 @@ end
 WaspModule.WaitInHive = function(PartRandome : Model?, Primary: Model?, PData : table)
     if PartRandome and Primary then
         repeat task.wait()
-            if PData.FakeSettings.Making == false then
+            if PData.FakeSettings.Making == false and not Character:FindFirstChild('HumanoidRootPart') then
                 break 
             end
         until (Primary.Position - PartRandome.Position).Magnitude <= 5
@@ -84,7 +84,7 @@ function WaspModule:LookVectorCharacter(Settings : table)
     task.spawn(function()
         while true do task.wait()
             if Settings.LookVector then
-                if PartRandome ~= nil then
+                if PartRandome ~= nil and Character:FindFirstChild('HumanoidRootPart') then
                     PartRandome.CFrame = CFrame.new(PartRandome.Position, PartRandome.Position + Character.HumanoidRootPart.CFrame.LookVector) * CFrame.Angles(0,math.rad(-90),0) 
                 end
             end
@@ -108,6 +108,13 @@ function WaspModule.NewWasp(PData : table, PosSlot : Vector3?, WaspModel : Modul
     local AlignPosition : AlignPosition = WaspModel.Model.Primary:FindFirstChild('AlignPosition')
     AlignPosition.MaxVelocity = self.WaspData.Speed
     AlignPosition.Responsiveness = self.WaspData.Speed / 2
+
+	local WaspMove : Animation = ReplicatedStorage.Assert.MoveWasp
+	local Anim : Animation = WaspModel.Model:FindFirstChild('Humanoid'):LoadAnimation(WaspMove)
+
+	if not Anim.IsPlaying then
+		Anim:Play()
+	end
 
     if not WaspModule.SettingTable then
         WaspModule.SettingTable = {}
@@ -144,7 +151,6 @@ function WaspModule:CollectPollen(TableWaspSettings : table) -- дописать
             if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
 
                 while FieldWasp do task.wait()
-                    print(TableWaspSettings.PlayerData.FakeSettings.Field)
                     if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" then
                         PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(40))
                         task.wait(TableWaspSettings.WaspSettings.ConvertsTime)
@@ -174,7 +180,7 @@ end
 function WaspModule:ComeToMe(TableWaspSettings : table)-- вылет с улья и подлет к персонажу
     local PartRandome : BasePart = TableWaspSettings.Model:FindFirstChild('PartRandome')
     local NewPos : Vector3? = TableWaspSettings.Character.HumanoidRootPart.Position + Vector3.new(math.random(-5,5), math.random(-0.5,1), math.random(-5,5))
-    PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) * CFrame.Angles(0,math.rad(-90),0)
+    PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, NewPos) --* CFrame.Angles(0,math.rad(-90),0)
     PartRandome.Position = NewPos
     task.wait(1)
     TableWaspSettings.LookVector = true
@@ -189,15 +195,22 @@ function WaspModule:Sleep(TableWaspSettings : table) -- Sleep Wasp
     PartRandome.Position = TableWaspSettings.SlotPos.WorldCFrame.Position
     PartRandome.CFrame = CFrame.lookAt(PartRandome.Position, Primary.Position) * CFrame.Angles(0,math.rad(90),0)
     if TableWaspSettings.WaspData.Energy <= 0 and WaspModule.GetDist(TableWaspSettings.Model, PartRandome) then -- подумать как сделать чтобы оно поварачивалось правильно
-        PartRandome.CFrame *= CFrame.Angles(0,math.rad(60),0)
-        PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(-90))
+        --PartRandome.CFrame *= CFrame.Angles(0,math.rad(90),0)
+        --PartRandome.CFrame *= CFrame.Angles(0,0,math.rad(-90))
 
         local TimeSleep : number = math.round(TableWaspSettings.WaspData.ELimit / 2) -- Какое ожидание будет 
     
         task.wait(TimeSleep) -- время сна
         TableWaspSettings.WaspData.Energy = TableWaspSettings.WaspData.ELimit
-        print("sleep stop")
+        --print("sleep stop")
     end
+end
+
+function WaspModule:SleepDiedPlayer(value,PData)
+	for i, v in next, PData.Wasps do
+		v.Energy = 0
+		WaspModule:Sleep(self.SettingTable[v.Name])
+	end
 end
 
 function WaspModule:AIPosRandom(settings : table) -- рандомная позиция осе
@@ -259,13 +272,15 @@ function WaspModule:MakeHoney(TableWaspSettings : table) -- БАГ в том ч�
         while true do task.wait(0.5)
             for _, value in next, workspace.GameSettings.Button:GetChildren() do
                 if value.Name == "Hive" then
-                    if value:GetAttribute('HiveOwner') == TableWaspSettings.Player.Name then
-                        if (TableWaspSettings.Character.PrimaryPart.Position -  value.Position).Magnitude <= 10 then
-                            DebWhile = true;
-                        else
-                            --print(TableWaspSettings.PlayerData.FakeSettings.Making)
-                            TableWaspSettings.PlayerData.FakeSettings.Making = false;
-                        end
+                    if value:GetAttribute('HiveOwner') == TableWaspSettings.Player.Name and TableWaspSettings.Character then
+						if Character:FindFirstChild('HumanoidRootPart') then
+							if (TableWaspSettings.Character.PrimaryPart.Position -  value.Position).Magnitude <= 10 then
+								DebWhile = true;
+							else
+								--print(TableWaspSettings.PlayerData.FakeSettings.Making)
+								TableWaspSettings.PlayerData.FakeSettings.Making = false;
+							end
+						end
                     end
                 end
             end
@@ -345,20 +360,21 @@ function WaspModule:TokenSpawn(TableWaspSettings : table) --Check
     end
 end
 
-function WaspModule:AIPos(NameWasp : string) 
-    task.spawn(function()
-        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-            local character = player.Character or player.CharacterAdded:Wait()
-            self.SettingTable[NameWasp.Name].Player = player
-            self.SettingTable[NameWasp.Name].Character = character
-            self.SettingTable[NameWasp.Name].Model.Primary:SetNetworkOwner(player)
-            self.SettingTable[NameWasp.Name].LookVector = false
-            continue
-        end
-        
-        local TableWaspSettings : table = self.SettingTable[NameWasp.Name]
+function WaspModule:AIPos(NameWasp : string)
 
+    task.spawn(function()
         while true do task.wait()
+			
+			for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+				local character = player.Character or player.CharacterAdded:Wait()
+				self.SettingTable[NameWasp.Name].Player = player
+				self.SettingTable[NameWasp.Name].Character = character
+				self.SettingTable[NameWasp.Name].Model.Primary:SetNetworkOwner(player)
+				self.SettingTable[NameWasp.Name].LookVector = false
+				continue
+			end
+
+			local TableWaspSettings : table = self.SettingTable[NameWasp.Name]
             if TableWaspSettings.Character and TableWaspSettings.Model then
                 if TableWaspSettings.WaspData.Energy <= 0 then -- Function Sleeps
                     self:Sleep(TableWaspSettings)
@@ -375,16 +391,18 @@ function WaspModule:AIPos(NameWasp : string)
                                 if TableWaspSettings.PlayerData.FakeSettings.Field ~= "" and TableWaspSettings.PlayerData.IStats.Pollen < TableWaspSettings.PlayerData.IStats.Capacity then
                                     self:CollectPollen(TableWaspSettings)
                                 elseif TableWaspSettings.PlayerData.FakeSettings.Field == "" or TableWaspSettings.PlayerData.IStats.Pollen >= TableWaspSettings.PlayerData.IStats.Capacity then
-                                    if TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude > 0 then
-                                        self:AIPosRandom({
-                                            Type = ">", TypeTable = TableWaspSettings
-                                        });
-                                    elseif TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude <= 0 then
-                                        self:AIPosRandom({
-                                            Type = "<=", TypeTable = TableWaspSettings
-                                        });
-                                    end
-                                    
+									print(TableWaspSettings.Character:FindFirstChild('Humanoid'))
+									if TableWaspSettings.Character:FindFirstChild('Humanoid') then
+										if TableWaspSettings.Character:FindFirstChild('Humanoid').MoveDirection.Magnitude > 0 then -- !Error
+											self:AIPosRandom({
+												Type = ">", TypeTable = TableWaspSettings
+											});
+										elseif TableWaspSettings.Character.Humanoid.MoveDirection.Magnitude <= 0 then
+											self:AIPosRandom({
+												Type = "<=", TypeTable = TableWaspSettings
+											});
+										end
+									end
                                 end
 
                             else

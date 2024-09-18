@@ -17,7 +17,7 @@ function HiveOwner(Player: Player, Hive : Part, Button : Part)
     if PData.FakeSettings.HiveOwner == "" and Button:GetAttribute('HiveOwner') == "" and Hive:GetAttribute('Owner') == "" then 
         
         PData.FakeSettings.HiveOwner = Player.Name
-        --Hive:SetAttribute('Owner', Player.Name)
+        Hive:SetAttribute('Owner', Player.Name)
         Button:SetAttribute('HiveOwner', Player.Name)
         Button.B.Enabled = false
         PData.FakeSettings.HiveNumberOwner = Hive.Name
@@ -62,7 +62,7 @@ function HiveServerModule:DiedPlayer(Player, PData : table)
                 if vGet:GetAttribute('HiveOwner') == Player.Name then
                     for index, value in next, workspace.GameSettings.Hives:GetChildren() do
                         if value:GetAttribute('Owner') == Player.Name then
-                            HiveSpawn(value,PData)
+									WaspModule:SleepDiedPlayer(value,PData)
                         end
                     end
                 end

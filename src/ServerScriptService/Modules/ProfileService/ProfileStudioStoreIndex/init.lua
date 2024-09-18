@@ -136,7 +136,7 @@ function ProfileData:DataNew()
             Slot = slot,
             Speed = 15,
             Energy = 25,
-            ELimit = 25,
+            ELimit = 15,
             Bond = 0,
             Level = 100,
         }
