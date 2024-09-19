@@ -9,28 +9,49 @@ local TokenInfoTable = require(script.TokenInfo)
 
 local TokenModule = {}
 
-function TokenRotation()
-	-- ! Rotation
+function TokenDelayWait()
+	-- ! TaskWait
+
 end
 
-function TokenDelayWait()
-	-- ! Rotation
+function TouchedCollect(NewToken : Model) -- ? Touched Collect
+	local heartbeatConnection
+	local startTime = tick()
+	local EndPosition = NewToken.PrimaryPart.CFrame + Vector3.new(0,8,0)
+
+	local function onHeartbeat() task.wait()
+		local elapsedTime = tick() - startTime
+		local alpha = math.clamp(elapsedTime * 2, 0, 1)
+		if NewToken ~= nil and NewToken then task.wait()
+			NewToken:PivotTo(NewToken.PrimaryPart.CFrame:Lerp(EndPosition, alpha))
+
+			if alpha >= 1 then
+				heartbeatConnection:Disconnect()
+				TweenModule:DestroyToken(NewToken)
+				task.wait(0.25)
+				NewToken:Destroy()
+			end
+		end
+	end
+
+	heartbeatConnection = RunService.Heartbeat:Connect(onHeartbeat)
 end
 
 function TokenUpField(NewToken : Model) --? Token Spawn Field 
 	local startTime = tick()
 
 	local heartbeatConnection
-	local EndPosition = NewToken.PrimaryPart.CFrame + Vector3.new(0,3,0)
+	local EndPosition = NewToken.PrimaryPart.CFrame + Vector3.new(0,3.5,0)
 
 	local function onHeartbeat() task.wait()
 		local elapsedTime = tick() - startTime
-		local alpha = math.clamp(elapsedTime / 2, 0, 1)
-
-		NewToken:PivotTo(NewToken.PrimaryPart.CFrame:Lerp(EndPosition, alpha))
-
-		if alpha >= 1 then
-			heartbeatConnection:Disconnect()
+		local alpha = math.clamp(elapsedTime * 4, 0, 1)
+		if NewToken:GetAttribute("Visible") then
+			NewToken:PivotTo(NewToken.PrimaryPart.CFrame:Lerp(EndPosition, alpha))
+			if alpha >= 1 then
+				NewToken:SetAttribute('StopPos', true)
+				heartbeatConnection:Disconnect()
+			end
 		end
 	end
 
@@ -63,47 +84,23 @@ function TokenModule:CreateToken(InfoToken : table) --? Create Token
 	ImageToken.Top.ImageLabel.Image = TokenInfo.Decal
 
 	NewToken:MoveTo(InfoToken.Pos)
-	
+	NewToken:SetAttribute('StopPos', false)
+	NewToken:SetAttribute('Visible', true)
 	TokenUpField(NewToken)
 
 	--? Touched Token
-	coroutine.wrap(function()
-		NewToken.PrimaryPart.Touched:Connect(function()
-			if workspace.GameSettings.Tokens:FindFirstChild(hit.Parent.Name) and workspace:FindFirstChild(hit.Parent.Name) and game.Players:FindFirstChild(hit.Parent.Name) then
-				NewToken:FindFirstChild('CubeDown').CanTouch = false
-				NewToken:FindFirstChild('CubeUp').CanTouch = false
-			end
-		end)
+	NewToken.PrimaryPart.Touched:Connect(function(hit)
+		if workspace.GameSettings.Tokens:FindFirstChild(hit.Parent.Name) and workspace:FindFirstChild(hit.Parent.Name) and game.Players:FindFirstChild(hit.Parent.Name) then
+			NewToken:FindFirstChild('CubeDown').CanTouch = false
+			NewToken:FindFirstChild('CubeUp').CanTouch = false
+			NewToken:SetAttribute("Visible", false)
+			NewToken:SetAttribute('StopPos', false)
+			TouchedCollect(NewToken)
+		end
 	end)
-
-
-    --Remotes.TokenClient:FireAllClients(NewToken)
-
-    --[[task.delay(TokenInfo.Timer, function() 
-        if NewToken and NewToken:FindFirstChild('Inside') and NewToken:FindFirstChild('Outside') then
-            TweenModule:DestroyToken(NewToken)
-        end
-    end)
-
-    NewToken.Inside.Touched:Connect(function(hit)
-        if workspace.GameSettings.Tokens:FindFirstChild(hit.Parent.Name) and workspace:FindFirstChild(hit.Parent.Name) and game.Players:FindFirstChild(hit.Parent.Name) then
-            NewToken:FindFirstChild('Inside').CanTouch = false
-            NewToken:FindFirstChild('Outside').CanTouch = false
-            TweenModule:TouchedToken(NewToken)
-        end
-    end)]]
 
 end
 
-Remotes.TokenServerStart.OnServerEvent:Connect(function(Player : Player, TokenCloner : BasePart)
-    TweenModule:FieldUpToken(TokenCloner)
 
-    task.spawn(function()
-        while true do task.wait()
-            TweenModule:AnimationToken(TokenCloner)
-        end
-    end)
-
-end)
 
 return TokenModule

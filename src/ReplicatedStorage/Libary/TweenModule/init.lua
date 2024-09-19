@@ -11,7 +11,7 @@ TweenModule.TweenInfoTable = {
     ['TweenCamera'] = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['TokenUpField'] = TweenInfo.new(1.5,Enum.EasingStyle.Elastic,Enum.EasingDirection.Out),
     ['TweenRotation'] = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-    ["DestroyToken"] = TweenInfo.new(1),
+    ["DestroyToken"] = TweenInfo.new(0.75),
     ['TweenTouched'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['UseShop'] = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     ['AnimateButton'] = TweenInfo.new(0.35,Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
@@ -147,14 +147,10 @@ function TweenModule:UseCamera(CameraStart : BasePart,CameraFinish : BasePart)
 end
 
 function TweenModule:DestroyToken(NewToken : BasePart)
-    TweenService:Create(NewToken.Inside, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
-    TweenService:Create(NewToken.Outside, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
-    TweenService:Create(NewToken.Inside.Decal1, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
-    TweenService:Create(NewToken.Inside.Decal2, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
-    task.wait(3)
-    if NewToken then
-        NewToken:Destroy()
-    end
+    TweenService:Create(NewToken.CubeDown, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.CubeUp, TweenModule.TweenInfoTable["DestroyToken"], {Transparency = 1}):Play()
+    TweenService:Create(NewToken.CubeDown.Bottom.ImageLabel, TweenModule.TweenInfoTable["DestroyToken"], {ImageTransparency = 1}):Play()
+    TweenService:Create(NewToken.CubeDown.Top.ImageLabel, TweenModule.TweenInfoTable["DestroyToken"], {ImageTransparency = 1}):Play()
 end
 
 function TweenModule:FieldUpToken(TokenNew : Model, TokenInfo : table)
