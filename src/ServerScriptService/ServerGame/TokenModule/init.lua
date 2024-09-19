@@ -15,6 +15,7 @@ function TokenDelayWait()
 end
 
 function TouchedCollect(NewToken : Model) -- ? Touched Collect
+	--! Проблема в том что при подборе подлет лаганый также нет определенный позиции. Скорее всего проблема в том что какой то рансервис ебет мазга
 	local heartbeatConnection
 	local startTime = tick()
 	local EndPosition = NewToken.PrimaryPart.CFrame + Vector3.new(0,8,0)
